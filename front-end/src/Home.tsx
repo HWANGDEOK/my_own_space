@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Post, HomeProps } from "./types/post";
-
+import { useNavigate } from 'react-router-dom';
 
 
 function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps) {
-
+    const navigate = useNavigate(); 
+    
     const [newPost, setNewPost] = useState<Post>({
         postId: 0,
         username: "",
@@ -44,12 +45,13 @@ function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps)
 
 
     return (<>
-    <button onClick={() => {
-        if (!isLogin) {
-            alert("로그인이 필요합니다");
-            return;
-            }
-            setIsModalOpen(!isModalOpen)}}>게시글 등록</button>
+        <button onClick={() => {
+            if (!isLogin) {
+                alert("로그인이 필요합니다");
+                return;
+                }
+            setIsModalOpen(!isModalOpen)}}>다른거
+        </button>
 
         <table style={{ width: '100%', marginTop: '20px', borderCollapse: 'collapse' }}>
             <thead>
@@ -80,17 +82,20 @@ function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps)
             </tbody>
         </table>
 
-        {isModalOpen && (
+        <button onClick={() => navigate('/post/posting')}>게시글 등록</button>
+
+        // 나중에 다른 기능으로 쓸 모달창
+        {/* {isModalOpen && (
             <div style={{width: "250px"}}>
                 <div style={{display: 'flex', flexDirection: 'column'}}>
-                    <h3>새 게시글 작성</h3>
+                    <h3></h3>
                     <input name="content" onChange={handleChange} type="text" placeholder="content" />
                     <input name="subject" onChange={handleChange} type="text" placeholder="subject" />
                     <button onClick={() => addPost(newPost)}>등록</button>
                     <button onClick={() => setIsModalOpen(false)}>취소</button>
                 </div>
             </div>
-        )}
+        )} */}
     </>
     )
 }

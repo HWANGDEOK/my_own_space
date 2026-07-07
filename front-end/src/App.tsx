@@ -39,6 +39,7 @@ function App() {
             />
             
             <Route path="/post/:id" element={<PostDetail posts={posts} />} />
+            {/* <Route path="/post/posting" element={<PostCreate} /> */}
         </Routes>
         </>
     )
