@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import type { Post, HomeProps } from "./types/post";
 import { useNavigate } from 'react-router-dom';
@@ -7,41 +6,11 @@ import { useNavigate } from 'react-router-dom';
 function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps) {
     const navigate = useNavigate(); 
     
-    const [newPost, setNewPost] = useState<Post>({
-        postId: 0,
-        username: "",
-        date: "",
-        subject: "",
-        content: ""
-    });
-
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-        setNewPost({
-        ...newPost,
-        [name]: value
-        });
-    };
-
-    const addPost = (newPost:Post):void => {
-        if (!newPost.content || !newPost.subject) {
-        alert("제목 및 내용을 입력하세요");
-        return;
-        }
-        setPosts([...posts, {
-        ...newPost,
-        postId: Date.now(),
-        username: "User",
-        date: new Date().toLocaleDateString(),
-        }]);
-        setIsModalOpen(false);
-        setNewPost({ postId: 0, username: "", date: "", subject: "", content: "" });
-    };
-
     const delPost = (id: number) => {
         const filteredPosts = posts.filter((post) => post.postId !== id);
         setPosts(filteredPosts);
     };
+
 
 
     return (<>
@@ -84,7 +53,7 @@ function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps)
 
         <button onClick={() => navigate('/post/posting')}>게시글 등록</button>
 
-        // 나중에 다른 기능으로 쓸 모달창
+        {/* 나중에 다른 기능으로 쓸 모달창 */}
         {/* {isModalOpen && (
             <div style={{width: "250px"}}>
                 <div style={{display: 'flex', flexDirection: 'column'}}>
