@@ -18,9 +18,8 @@ function PostCreate({handleChange, addPost}:PostCreateProps) {
                 <input name="content" onChange={handleChange} type="text" placeholder="content" />
                 <button onClick={() => {
                     addPost()
-                    navigate('/')
                 }}>등록</button>
-                <button onClick={() => navigate('/')}>취소</button>
+                <button onClick={() => navigate('/postboard')}>취소</button>
             </div>
         </div>
     </>

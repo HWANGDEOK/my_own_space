@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
-import Home from "./Home";
+import PostHome from "./PostHome";
 import PostDetail from "./PostDetail";
 import PostCreate from "./PostCreate";
 import type { Post } from "./types/post";
@@ -8,8 +8,8 @@ import { useNavigate } from 'react-router-dom';
 
 function App() {
     const navigate = useNavigate();
-    const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [isLogin, setIsLogin] = useState<boolean>(true);
+    // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+    // const [isLogin, setIsLogin] = useState<boolean>(true);
 
     const [posts, setPosts] = useState<Post[]>([
         { postId: 1, username: "user1", date: "2026", subject:"첫 인사", content: "안녕하세요" },
@@ -44,9 +44,8 @@ function App() {
             username: "User",
             date: new Date().toLocaleDateString(),
         }]);
-        setIsModalOpen(false);
         setNewPost({ postId: 0, username: "", date: "", subject: "", content: "" });
-        navigate('/');
+        navigate('/postboard');
     };
 
     
@@ -55,23 +54,24 @@ function App() {
         <>
         <header>
             <button onClick={() => {
-                setIsLogin(true)
                 console.log("로그인!")
+                localStorage.setItem('isLoggedIn', '1')
             }}>로그인</button>
-            <button style={{backgroundColor: "#03a94d"}} onClick={() => setIsLogin(true)}>네이버 로그인</button>
+            <button style={{backgroundColor: "#03a94d"}} onClick={() => {}}>네이버 로그인</button>
             <button onClick={() => {
-                setIsLogin(false)
                 console.log("로그아웃!")
+                localStorage.removeItem('isLoggedIn')
             }}>로그아웃</button>
             <button onClick={() => navigate('/')}>홈으로</button>
         </header>
+        <div>
+            <button onClick={() => navigate('/postboard')}>게시판</button>
+            <button onClick={() => navigate('/karaoke')}>노래방 노래 번호 찾기</button>
+        </div>
         
         <Routes>
-            <Route path="/" element={
-            <Home
-                isLogin={isLogin}
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
+            <Route path="/postboard" element={
+            <PostHome
                 posts={posts}
                 setPosts={setPosts} />}
             />

@@ -1,9 +1,9 @@
 import { Link } from "react-router-dom";
-import type { Post, HomeProps } from "./types/post";
+import type { HomeProps } from "./types/post";
 import { useNavigate } from 'react-router-dom';
 
 
-function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps) {
+function PostHome({posts, setPosts}:HomeProps) {
     const navigate = useNavigate(); 
     
     const delPost = (id: number) => {
@@ -14,13 +14,23 @@ function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps)
 
 
     return (<>
-        <button onClick={() => {
+        {/* <button onClick={() => {
             if (!isLogin) {
                 alert("로그인이 필요합니다");
                 return;
                 }
             setIsModalOpen(!isModalOpen)}}>다른거
-        </button>
+        </button> */}
+
+        <button onClick={() => {
+            const loginStatus = !!localStorage.getItem('isLoggedIn');
+                if (loginStatus) {
+                    navigate('/post/posting')
+                } else {
+                    alert("로그인이 필요합니다.")
+                }
+            }
+        }>게시글 등록</button>
 
         <table style={{ width: '100%', marginTop: '20px', borderCollapse: 'collapse' }}>
             <thead>
@@ -51,8 +61,6 @@ function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps)
             </tbody>
         </table>
 
-        <button onClick={() => navigate('/post/posting')}>게시글 등록</button>
-
         {/* 나중에 다른 기능으로 쓸 모달창 */}
         {/* {isModalOpen && (
             <div style={{width: "250px"}}>
@@ -69,4 +77,4 @@ function Home({isLogin, isModalOpen, setIsModalOpen, posts, setPosts}:HomeProps)
     )
 }
 
-export default Home;
+export default PostHome;
