@@ -1,8 +1,8 @@
 package com.hyeondeok.back_end.Service;
 
-import com.hyeondeok.back_end.Dto.PostDto;
-import com.hyeondeok.back_end.Entity.Post;
-import com.hyeondeok.back_end.Repository.PostRepository;
+import com.hyeondeok.back_end.dto.PostDto;
+import com.hyeondeok.back_end.entity.Post;
+import com.hyeondeok.back_end.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

@@ -1,6 +1,6 @@
-package com.hyeondeok.back_end.Repository;
+package com.hyeondeok.back_end.repository;
 
-import com.hyeondeok.back_end.Entity.Post;
+import com.hyeondeok.back_end.entity.Post;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

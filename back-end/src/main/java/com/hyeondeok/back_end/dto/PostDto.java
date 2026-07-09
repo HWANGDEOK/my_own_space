@@ -1,6 +1,6 @@
-package com.hyeondeok.back_end.Dto;
+package com.hyeondeok.back_end.dto;
 
-import com.hyeondeok.back_end.Entity.Post;
+import com.hyeondeok.back_end.entity.Post;
 import lombok.Data;
 
 @Data

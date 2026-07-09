@@ -1,7 +1,6 @@
-package com.hyeondeok.back_end.Entity;
+package com.hyeondeok.back_end.entity;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Data;
 import java.time.LocalDateTime;
 
