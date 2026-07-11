@@ -32,7 +32,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .issuedAt(now)
                 .expiration(expiredTime)
-                .signWith(key) // 아까 만든 64바이트 SecretKey (HS512 자동적용)
+                .signWith(key) // 아까 만든 64바이트 SecretKey
                 .compact();
     }
 
