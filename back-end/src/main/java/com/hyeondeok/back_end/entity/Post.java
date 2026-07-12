@@ -11,15 +11,23 @@ public class Post {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long postId;
 
+    @Column
+    private long userId;
+
+    @Column
     private String username;
 
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    private LocalDateTime date;
+    @Column
+    private String subject;
+
+    @Column
+    private LocalDateTime postdate;
 
     @PrePersist
     public void prePersist() {
-        this.date = LocalDateTime.now();
+        this.postdate = LocalDateTime.now();
     }
 }

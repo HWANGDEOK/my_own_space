@@ -6,41 +6,44 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
 
+import java.time.LocalDateTime;
+
 @Entity
-@Table(name = "users")
 @Getter
+@Table(name = "user_tb")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 시스템 내부 식별자 (PK)
-
-    // 1. OAuth2 연동을 위한 핵심 변수
-    @Column(nullable = false)
-    private String provider; // "google", "naver"
+    private Long userId;
 
     @Column(nullable = false)
-    private String providerId; // 소셜 플랫폼에서 나에게 준 유저의 "고유 숫자/문자열 ID"
-
-    // 2. 소셜 가입 시 받아올 유저 정보
-    @Column(nullable = false)
-    private String email; // 사용자의 이메일
+    private String provider; // google
 
     @Column(nullable = false)
-    private String nickname; // 사용자의 이름 또는 닉네임
+    private String providerId;
 
+    @Column(nullable = false)
+    private String email;
+
+    @Column(nullable = false)
+    private String nickname;
+
+    @Column(nullable = false)
+    private LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private Role role;
 
     @Builder
-    public User(String provider, String providerId, String email, String nickname, Role role) {
+    public User(String provider, String providerId, String email, String nickname, Role role, LocalDateTime createdAt) {
         this.provider = provider;
         this.providerId = providerId;
         this.email = email;
         this.nickname = nickname;
         this.role = role;
+        this.createdAt = createdAt;
     }
 }

@@ -1,4 +1,4 @@
-package com.hyeondeok.back_end.Service;
+package com.hyeondeok.back_end.service;
 
 import com.hyeondeok.back_end.dto.PostDto;
 import com.hyeondeok.back_end.entity.Post;
