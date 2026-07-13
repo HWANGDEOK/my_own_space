@@ -18,6 +18,7 @@ public class JwtTokenProvider {
     private final SecretKey key;
 
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+
         // Base64로 된 88글자를 진짜 64바이트 데이터로 해독
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         // 해독된 데이터를 바탕으로 HMAC-SHA 키 생성
@@ -30,6 +31,9 @@ public class JwtTokenProvider {
         Date expiredTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
 
         return Jwts.builder()
+                .subject(String.valueOf(user.getUserId()))
+                .claim("email", user.getEmail())
+                .claim("role", user.getRole().name())
                 .issuedAt(now)
                 .expiration(expiredTime)
                 .signWith(key)
@@ -55,7 +59,7 @@ public class JwtTokenProvider {
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
-                .getPayload(); // 최신 0.12.x 문법 (getBody 대신)
+                .getPayload();
     }
 
 }

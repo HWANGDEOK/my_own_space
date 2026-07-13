@@ -28,6 +28,9 @@ public class User {
     private String email;
 
     @Column(nullable = false)
+    private String name;
+
+    @Column(nullable = false)
     private String nickname;
 
     @Column(nullable = false)
@@ -38,10 +41,11 @@ public class User {
     private Role role;
 
     @Builder
-    public User(String provider, String providerId, String email, String nickname, Role role, LocalDateTime createdAt) {
+    public User(String provider, String providerId, String email, String name, String nickname, Role role, LocalDateTime createdAt) {
         this.provider = provider;
         this.providerId = providerId;
         this.email = email;
+        this.name = name;
         this.nickname = nickname;
         this.role = role;
         this.createdAt = createdAt;

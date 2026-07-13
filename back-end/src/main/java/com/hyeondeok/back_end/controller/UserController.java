@@ -21,8 +21,8 @@ public class UserController {
 
         // OAuth2 가입 상황을 가정한 더미 데이터 전달
         // http://localhost:8080/user/test-save?nickname=hyeondeok
-        User savedUser = userService.saveUser("google", "google-sub-123456", "test1234@test.com", nickname);
+//        User savedUser = userService.saveUser("google", "google-sub-123456", "test1234@test.com", "name", nickname);
 
-        return "DB 저장 완료. ID: " + savedUser.getUserId();
+        return "DB 저장 완료";
     }
 }

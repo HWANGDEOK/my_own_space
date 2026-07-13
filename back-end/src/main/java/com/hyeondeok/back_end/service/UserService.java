@@ -15,7 +15,7 @@ public class UserService {
     private final UserRepository userRepository;
 
     @Transactional
-    public User saveUser(String provider, String providerId, String email, String nickname) {
+    public User saveUser(String provider, String providerId, String email, String name, String nickname) {
         // 이미 가입된 유저인지 확인
         return userRepository.findByProviderAndProviderId(provider, providerId)
                 .orElseGet(() -> {
@@ -24,6 +24,7 @@ public class UserService {
                             .provider(provider)
                             .providerId(providerId)
                             .email(email)
+                            .name(name)
                             .nickname(nickname)
                             .role(Role.ROLE_USER)
                             .createdAt(LocalDateTime.now())
