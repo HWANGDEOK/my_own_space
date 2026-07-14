@@ -50,4 +50,11 @@ public class User {
         this.role = role;
         this.createdAt = createdAt;
     }
+
+
+    public void updateProfile(String name, String email) {
+        this.name = name;
+        this.email = email;
+        // 닉네임은 최초 랜덤 부여 후 따로 변경할 것이므로 구글 로그인 시점엔 갱신하지 않고 유지합니다.
+    }
 }

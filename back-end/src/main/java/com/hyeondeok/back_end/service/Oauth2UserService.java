@@ -2,7 +2,6 @@ package com.hyeondeok.back_end.service;
 
 import com.hyeondeok.back_end.entity.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
@@ -14,12 +13,12 @@ import org.springframework.stereotype.Service;
 import java.util.Collections;
 import java.util.Map;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class Oauth2UserService extends DefaultOAuth2UserService {
 
     private final UserService userService;
+    private final NicknameService nicknameService;
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -38,11 +37,9 @@ public class Oauth2UserService extends DefaultOAuth2UserService {
         String providerId = (String) attributes.get("sub");
         String email = (String) attributes.get("email");
         String name = (String) attributes.get("name");
-        String temporaryNickname = "nickname";
+        String nickname = nicknameService.generateRandomNickname();
 
-        log.info("OAuth2 로그인 시도 - Provider: {}, ProviderId: {}, Email: {}", provider, providerId, email);
-
-        User user = userService.saveUser(provider, providerId, email, name, temporaryNickname);
+        User user = userService.saveUser(provider, providerId, email, name, nickname);
 
         // Spring Security Context 에 인증된 유저 정보를 넘겨주기 위해 DefaultOAuth2User 객체를 생성 후 반환
         return new DefaultOAuth2User(

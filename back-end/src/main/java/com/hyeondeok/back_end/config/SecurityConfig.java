@@ -24,6 +24,7 @@ import java.util.List;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+
     private final Oauth2UserService oauth2UserService;
     private final Oauth2SuccessHandler oauth2SuccessHandler;
     private final JwtTokenProvider jwtTokenProvider;
