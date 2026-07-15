@@ -61,7 +61,7 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 user.getUserId(),
                 tokenId,
                 refreshToken,
-                Duration.ofSeconds(jwtCookieProperties.getRefreshMaxAge())
+                Duration.ofSeconds(jwtCookieProperties.getRefreshTokenMaxAge())
         );
 
         tokenCookieService.addTokenCookies(response, accessToken, refreshToken);

@@ -16,6 +16,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -38,7 +39,11 @@ public class SecurityConfig {
         http
             // REST API 관련 설정
             .cors(Customizer.withDefaults())
-            .csrf(AbstractHttpConfigurer::disable)
+            .csrf(csrf -> csrf
+                    .csrfTokenRepository(
+                            CookieCsrfTokenRepository.withHttpOnlyFalse()
+                    )
+            )
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
 
@@ -50,6 +55,7 @@ public class SecurityConfig {
                     .requestMatchers(
                             "/oauth2/**",
                             "/login/**",
+                            "/api/auth/csrf",
                             "/api/auth/refresh",
                             "/api/auth/logout",
                             "/error"

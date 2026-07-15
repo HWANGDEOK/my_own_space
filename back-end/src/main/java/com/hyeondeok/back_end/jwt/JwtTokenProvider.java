@@ -1,10 +1,12 @@
 package com.hyeondeok.back_end.jwt;
 
+import com.hyeondeok.back_end.config.JwtCookieProperties;
 import com.hyeondeok.back_end.entity.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import io.jsonwebtoken.io.Decoders;
@@ -16,10 +18,11 @@ import java.util.UUID;
 @Component
 public class JwtTokenProvider {
 
+    private final JwtCookieProperties jwtCookieProperties;
     private final SecretKey key;
-    private final int accessTokenValidTime = 30 * 60 * 1000; // 30분
-    private final int refreshTokenValidTime = 24 * 60 * 60 * 1000; // 1일
-    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
+
+    public JwtTokenProvider(@Value("${jwt.secret}") String secretKey, JwtCookieProperties jwtCookieProperties) {
+        this.jwtCookieProperties = jwtCookieProperties;
 
         // Base64로 된 88글자를 진짜 64바이트 데이터로 해독
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -30,11 +33,11 @@ public class JwtTokenProvider {
     // AccessToken 생성
     public String createAccessToken(User user) {
         Date now = new Date();
-        Date expiredTime = new Date(now.getTime() + accessTokenValidTime);
+        Date expiredTime = new Date(now.getTime() + jwtCookieProperties.getAccessTokenMaxAge() * 1000);
 
         return Jwts.builder()
                 .subject(String.valueOf(user.getUserId()))
-                .claim("type", "refresh")
+                .claim("type", "access")
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole().name())
                 .issuedAt(now)
@@ -46,7 +49,7 @@ public class JwtTokenProvider {
     // refreshToken 생성
     public String createRefreshToken(User user) {
         Date now = new Date();
-        Date expiredTime = new Date(now.getTime() + refreshTokenValidTime);
+        Date expiredTime = new Date(now.getTime() + jwtCookieProperties.getRefreshTokenMaxAge() * 1000);
 
         return Jwts.builder()
                 .subject(String.valueOf(user.getUserId()))

@@ -5,3 +5,12 @@ spring:
 
   profiles:
     include: secret
+
+
+
+
+jwt:
+  cookie:
+    access-token-max-age: 1800      # 30분, 초 단위
+    refresh-token-max-age: 21600   # 6시간 , 초 단위
+    secure: false # application-prod.yaml 에서는 true

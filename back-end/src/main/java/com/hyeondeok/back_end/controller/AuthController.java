@@ -8,7 +8,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -31,7 +33,7 @@ public class AuthController {
 
         AuthService.TokenPair tokenPair = authService.refresh(
                 refreshToken,
-                Duration.ofSeconds(jwtCookieProperties.getRefreshMaxAge())
+                Duration.ofSeconds(jwtCookieProperties.getAccessTokenMaxAge())
         );
 
         tokenCookieService.addTokenCookies(
@@ -53,6 +55,11 @@ public class AuthController {
 
         tokenCookieService.clearTokenCookies(response);
 
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/csrf")
+    public ResponseEntity<Void> csrf(CsrfToken csrfToken) {
         return ResponseEntity.noContent().build();
     }
 }

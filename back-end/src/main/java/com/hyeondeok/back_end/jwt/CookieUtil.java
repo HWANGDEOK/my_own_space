@@ -10,10 +10,7 @@ import java.util.Optional;
 @NoArgsConstructor
 public final class CookieUtil {
 
-    public static Optional<String> getValue(
-            HttpServletRequest request,
-            String cookieName
-    ) {
+    public static Optional<String> getValue(HttpServletRequest request, String cookieName) {
         Cookie[] cookies = request.getCookies();
 
         if (cookies == null) {

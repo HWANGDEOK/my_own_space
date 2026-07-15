@@ -20,7 +20,7 @@ public class TokenCookieService {
                 .secure(jwtCookieProperties.isSecure()) // 운영 HTTPS에서는 반드시 true
                 .sameSite("Lax")
                 .path("/")
-                .maxAge(Duration.ofSeconds(jwtCookieProperties.getAccessMaxAge()))
+                .maxAge(Duration.ofSeconds(jwtCookieProperties.getAccessTokenMaxAge()))
                 .build();
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
@@ -28,7 +28,7 @@ public class TokenCookieService {
                 .secure(jwtCookieProperties.isSecure()) // 운영 HTTPS에서는 반드시 true
                 .sameSite("Strict")
                 .path("/api/auth") // refresh/logout 요청에만 전송
-                .maxAge(Duration.ofSeconds(jwtCookieProperties.getRefreshMaxAge()))
+                .maxAge(Duration.ofSeconds(jwtCookieProperties.getRefreshTokenMaxAge()))
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
