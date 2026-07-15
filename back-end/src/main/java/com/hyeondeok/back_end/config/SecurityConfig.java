@@ -46,7 +46,8 @@ public class SecurityConfig {
 
             // url 권한
             .authorizeHttpRequests(auth -> auth
-                    .anyRequest().permitAll()
+                    .requestMatchers("/api/auth/refresh").permitAll()
+                    .anyRequest().authenticated()
             )
 
             .oauth2Login(oauth2 -> oauth2

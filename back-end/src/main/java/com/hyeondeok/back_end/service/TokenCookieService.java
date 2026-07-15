@@ -35,4 +35,25 @@ public class TokenCookieService {
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
 
     }
+
+    public void clearTokenCookies(HttpServletResponse response) {
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", "")
+                .httpOnly(true)
+                .secure(jwtCookieProperties.isSecure())
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ZERO)
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(jwtCookieProperties.isSecure())
+                .sameSite("Strict")
+                .path("/api/auth")
+                .maxAge(Duration.ZERO)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
 }

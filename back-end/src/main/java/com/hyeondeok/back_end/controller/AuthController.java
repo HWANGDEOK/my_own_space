@@ -42,4 +42,17 @@ public class AuthController {
 
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<Void> logout(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) {
+        CookieUtil.getValue(request, "refresh_token")
+                .ifPresent(authService::logout);
+
+        tokenCookieService.clearTokenCookies(response);
+
+        return ResponseEntity.noContent().build();
+    }
 }

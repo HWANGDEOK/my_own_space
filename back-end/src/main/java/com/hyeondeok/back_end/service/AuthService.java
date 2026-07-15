@@ -61,4 +61,24 @@ public class AuthService {
 
     public record TokenPair(String accessToken, String refreshToken) {
     }
+
+
+    public void logout(String refreshToken) {
+        if (!jwtTokenProvider.validateToken(refreshToken)) {
+            return;
+        }
+
+        Claims claims = jwtTokenProvider.getClaims(refreshToken);
+
+        if (!"refresh".equals(claims.get("type", String.class))) {
+            return;
+        }
+
+        Long userId = Long.valueOf(claims.getSubject());
+        String tokenId = claims.getId();
+
+        if (tokenId != null) {
+            refreshTokenRepository.delete(userId, tokenId);
+        }
+    }
 }
