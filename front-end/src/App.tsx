@@ -2,15 +2,21 @@ import { useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import PostHome from "./PostHome";
 import PostDetail from "./PostDetail";
-import PostCreate from "./PostCreate";
+import PostCreate from "./CreatePost";
 import type { Post } from "./types/post";
 import { useNavigate } from 'react-router-dom';
+import OAuth2RedirectHandler from "./pages/Oauth2RedirectHandler";
+import Profile from "./pages/Profile";
+import Header from "./components/Header";
 
 function App() {
     const navigate = useNavigate();
     // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    // const [isLogin, setIsLogin] = useState<boolean>(true);
+    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
+        () => !!localStorage.getItem('accessToken')
+    );
 
+    
     const [posts, setPosts] = useState<Post[]>([
         { postId: 1, username: "user1", date: "2026", subject:"첫 인사", content: "안녕하세요" },
         { postId: 2, username: "user2", date: "2026", subject:"가입 인사", content: "반갑습니다." }
@@ -24,14 +30,14 @@ function App() {
     });
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-        setNewPost({
-        ...newPost,
-        [name]: value
-        });
+        const { name, value } = e.target;
+            setNewPost({
+            ...newPost,
+            [name]: value
+            });
     };
 
-    const addPost = ():void => {
+    const addPost = () => {
         if (!newPost.content || !newPost.subject) {
             alert("제목 및 내용을 입력하세요");
             return;
@@ -48,25 +54,37 @@ function App() {
         navigate('/postboard');
     };
 
+    const handleLogout = () => {
+        console.log("로그아웃!");
+        localStorage.removeItem('accessToken');
+        setIsLoggedIn(false);
+        navigate('/');
+    }
     
     return (
     
         <>
         <header>
-            <button onClick={() => {
-                console.log("로그인!")
-                localStorage.setItem('isLoggedIn', '1')
-            }}>로그인</button>
-            <button style={{backgroundColor: "#03a94d"}} onClick={() => {}}>네이버 로그인</button>
-            <button onClick={() => {
-                console.log("로그아웃!")
-                localStorage.removeItem('isLoggedIn')
-            }}>로그아웃</button>
+            {!isLoggedIn ? (
+                <>
+                    <button style={{backgroundColor: "#3C83F6"}} 
+                    onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
+                    >구글 로그인</button>
+                </>
+            ) : (
+                <>
+                    <button onClick={handleLogout}>로그아웃</button>
+                    <button onClick={() => navigate('/profile')}>마이프로필</button>
+                </>
+            )}
+
             <button onClick={() => navigate('/')}>홈으로</button>
         </header>
+        <Header />
         <div>
             <button onClick={() => navigate('/postboard')}>게시판</button>
-            <button onClick={() => navigate('/karaoke')}>노래방 노래 번호 찾기</button>
+            <button onClick={() => navigate('/profile')}>프로필</button>
+
         </div>
         
         <Routes>
@@ -83,6 +101,8 @@ function App() {
                     addPost={() => addPost()} 
                 />} 
             />
+            <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler setIsLoggedIn={setIsLoggedIn}/>} />
+            <Route path="/profile" element={<Profile />} />
         </Routes>
         </>
     )

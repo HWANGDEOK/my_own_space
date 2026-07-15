@@ -23,8 +23,8 @@ function PostHome({posts, setPosts}:HomeProps) {
         </button> */}
 
         <button onClick={() => {
-            const loginStatus = !!localStorage.getItem('isLoggedIn');
-                if (loginStatus) {
+            const token = localStorage.getItem('accessToken');
+                if (token) {
                     navigate('/post/posting')
                 } else {
                     alert("로그인이 필요합니다.")
