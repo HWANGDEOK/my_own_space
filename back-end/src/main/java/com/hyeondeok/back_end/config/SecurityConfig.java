@@ -5,6 +5,7 @@ import com.hyeondeok.back_end.jwt.JwtTokenProvider;
 import com.hyeondeok.back_end.security.Oauth2SuccessHandler;
 import com.hyeondeok.back_end.service.Oauth2UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -20,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.List;
 
+@EnableConfigurationProperties(JwtCookieProperties.class)
 @Configuration
 @EnableWebSecurity
 @RequiredArgsConstructor
