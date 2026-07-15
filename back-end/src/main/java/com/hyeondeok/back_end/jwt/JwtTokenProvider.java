@@ -16,7 +16,8 @@ import java.util.Date;
 public class JwtTokenProvider {
 
     private final SecretKey key;
-
+    private final int accessTokenValidTime = 30 * 60 * 1000; // 30분
+    private final int refreshTokenValidTime = 24 * 60 * 60 * 1000; // 1일
     public JwtTokenProvider(@Value("${jwt.secret}") String secretKey) {
 
         // Base64로 된 88글자를 진짜 64바이트 데이터로 해독
@@ -25,15 +26,30 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    // User 엔티티를 받아서 토큰 생성
-    public String createToken(User user) {
+    // AccessToken 생성
+    public String createAccessToken(User user) {
         Date now = new Date();
-        Date expiredTime = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+        Date expiredTime = new Date(now.getTime() + accessTokenValidTime);
 
         return Jwts.builder()
                 .subject(String.valueOf(user.getUserId()))
+                .claim("type", "refresh")
                 .claim("email", user.getEmail())
                 .claim("role", user.getRole().name())
+                .issuedAt(now)
+                .expiration(expiredTime)
+                .signWith(key)
+                .compact();
+    }
+
+    // refreshToken 생성
+    public String createRefreshToken(User user) {
+        Date now = new Date();
+        Date expiredTime = new Date(now.getTime() + refreshTokenValidTime);
+
+        return Jwts.builder()
+                .subject(String.valueOf(user.getUserId()))
+                .claim("type", "refresh")
                 .issuedAt(now)
                 .expiration(expiredTime)
                 .signWith(key)

@@ -9,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.IOException;
+import java.time.Duration;
 
 @Slf4j
 @Component
@@ -41,13 +43,37 @@ public class Oauth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 유저입니다."));
 
         // 토큰 발행
-        String accessToken = jwtTokenProvider.createToken(user);
+        String accessToken = jwtTokenProvider.createAccessToken(user);
+        String refreshToken = jwtTokenProvider.createRefreshToken(user);
+
+        addTokenCookies(response, accessToken, refreshToken);
 
         // 프론트결과 페이지로 토큰을 실어서 리다이렉트
-        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/oauth2/redirect")
-                .queryParam("token", accessToken)
-                .build().toUriString();
+//        String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/oauth2/redirect")
+//                .queryParam("token", accessToken)
+//                .build().toUriString();
 
-        getRedirectStrategy().sendRedirect(request, response, targetUrl);
+        getRedirectStrategy().sendRedirect(request, response, "http://localhost:5173/oauth2/redirect");
+    }
+
+
+
+    private void addTokenCookies(HttpServletResponse response, String accessToken,  String refreshToken) {
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(false) // 운영 HTTPS에서는 반드시 true
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofMinutes(15))
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
+                .httpOnly(true)
+                .secure(false) // 운영 HTTPS에서는 반드시 true
+                .sameSite("Strict")
+                .path("/api/auth") // refresh/logout 요청에만 전송
+                .maxAge(Duration.ofDays(7))
+                .build();
+
     }
 }

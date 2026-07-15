@@ -19,7 +19,6 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
         // JwtAuthenticationFilter 에서의 userId 꺼내기
