@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Route, Routes } from "react-router-dom";
 import PostHome from "./PostHome";
 import PostDetail from "./PostDetail";
@@ -7,16 +7,31 @@ import type { Post } from "./types/post";
 import { useNavigate } from 'react-router-dom';
 import OAuth2RedirectHandler from "./pages/Oauth2RedirectHandler";
 import Profile from "./pages/Profile";
-import Header from "./components/Header";
+import { useAuthStore } from "./store/authStore";
+import { useUser } from "./hooks/useUser";
+import { useLogout } from "./hooks/useLogout";
 
 function App() {
     const navigate = useNavigate();
-    // const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-    const [isLoggedIn, setIsLoggedIn] = useState<boolean>(
-        () => !!localStorage.getItem('accessToken')
-    );
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
 
-    
+    // 앱 최초 로드 시 로그인 상태 확인 (httpOnly 쿠키라 JS로 직접 확인 불가 -> API로 확인)
+    const { data: user, isSuccess, isError } = useUser();
+
+
+    useEffect(() => {
+        if (isSuccess && user) {
+            setAuthenticated(true);
+        }
+        if (isError) {
+            setAuthenticated(false);
+        }
+    }, [isSuccess, isError, user, setAuthenticated]);
+
+    const handleLogout = useLogout();
+
+
     const [posts, setPosts] = useState<Post[]>([
         { postId: 1, username: "user1", date: "2026", subject:"첫 인사", content: "안녕하세요" },
         { postId: 2, username: "user2", date: "2026", subject:"가입 인사", content: "반갑습니다." }
@@ -34,7 +49,7 @@ function App() {
             setNewPost({
             ...newPost,
             [name]: value
-            });
+        });
     };
 
     const addPost = () => {
@@ -54,18 +69,12 @@ function App() {
         navigate('/postboard');
     };
 
-    const handleLogout = () => {
-        console.log("로그아웃!");
-        localStorage.removeItem('accessToken');
-        setIsLoggedIn(false);
-        navigate('/');
-    }
     
     return (
     
         <>
         <header>
-            {!isLoggedIn ? (
+            {!isAuthenticated ? (
                 <>
                     <button style={{backgroundColor: "#3C83F6"}} 
                     onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
@@ -80,7 +89,6 @@ function App() {
 
             <button onClick={() => navigate('/')}>홈으로</button>
         </header>
-        <Header />
         <div>
             <button onClick={() => navigate('/postboard')}>게시판</button>
             <button onClick={() => navigate('/profile')}>프로필</button>
@@ -101,7 +109,7 @@ function App() {
                     addPost={() => addPost()} 
                 />} 
             />
-            <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler setIsLoggedIn={setIsLoggedIn}/>} />
+            <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
             <Route path="/profile" element={<Profile />} />
         </Routes>
         </>

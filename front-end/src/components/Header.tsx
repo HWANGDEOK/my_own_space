@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAuthTimer } from "../hooks/useAuthTimer";
+import { useAuthTimer } from "../store/useAuthTimer";
 import { useUser } from "../hooks/useUser";
 
 
