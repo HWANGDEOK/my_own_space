@@ -1,5 +1,6 @@
 package com.hyeondeok.back_end.filter;
 
+import com.hyeondeok.back_end.jwt.CookieUtil;
 import com.hyeondeok.back_end.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -14,13 +15,11 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.Collections;
 
-@Slf4j
 @RequiredArgsConstructor
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
@@ -32,10 +31,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
         if (token != null && jwtTokenProvider.validateToken(token)) {
             Claims claims = jwtTokenProvider.getClaims(token);
+            if (!"access".equals(claims.get("type", String.class))) {
+                filterChain.doFilter(request, response);
+                return;
+            }
 
             // 토큰에 담긴 정보
             String userId = claims.getSubject();
-            String role = (String) claims.get("role");
+            String role = claims.get("role",String.class);
 
             // 시큐리티 전용 유저 객체 생성
             UserDetails userDetails = new User(userId, "",
@@ -47,20 +50,14 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // 스프링 시큐리티 세션에 인증 객체 적재
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.info("JWT 토큰 인증 성공 - User ID: {}", userId);
         }
-
 
         filterChain.doFilter(request, response);
     }
 
 
-
     private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader("Authorization");
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
+        return CookieUtil.getValue(request, "access_token")
+                .orElse(null);
     }
 }

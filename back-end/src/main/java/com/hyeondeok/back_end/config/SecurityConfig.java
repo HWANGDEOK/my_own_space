@@ -4,6 +4,7 @@ import com.hyeondeok.back_end.filter.JwtFilter;
 import com.hyeondeok.back_end.jwt.JwtTokenProvider;
 import com.hyeondeok.back_end.security.Oauth2SuccessHandler;
 import com.hyeondeok.back_end.service.Oauth2UserService;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -46,10 +47,21 @@ public class SecurityConfig {
 
             // url 권한
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/auth/refresh").permitAll()
+                    .requestMatchers(
+                            "/oauth2/**",
+                            "/login/**",
+                            "/api/auth/refresh",
+                            "/api/auth/logout",
+                            "/error"
+                    ).permitAll()
                     .anyRequest().authenticated()
-            )
 
+            )
+            .exceptionHandling(exception -> exception
+                    .authenticationEntryPoint((request, response, exception2) ->
+                            response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                    )
+            )
             .oauth2Login(oauth2 -> oauth2
                     .authorizationEndpoint(authorization -> authorization
                             .baseUri("/oauth2/authorization")
