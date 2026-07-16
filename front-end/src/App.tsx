@@ -9,33 +9,49 @@ import OAuth2RedirectHandler from "./pages/Oauth2RedirectHandler";
 import Profile from "./pages/Profile";
 import { useAuthStore } from "./store/authStore";
 import { useUser } from "./hooks/useUser";
-import { useLogout } from "./hooks/useLogout";
 import Home from "./pages/Home";
+import api, { logout } from "./apis/userApi";
+import { useAuthTimer } from "./store/useAuthTimer";
+import Header from "./components/Header";
 
 function App() {
     const navigate = useNavigate();
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
+    const {setMaxAge} = useAuthTimer();
 
-    // 앱 최초 로드 시 로그인 상태 확인 (httpOnly 쿠키라 JS로 직접 확인 불가 -> API로 확인)
-    const { data: user, isSuccess, isError } = useUser();
+    // 최초로드 시 유저정보 가져오기
+    const { data: user, isError, isLoading } = useUser();
+
+    // 토큰 만료 시간 받아와서 타이머에 세팅하기
+    // 최초 1회 앱 설정 정보(accessTokenMaxAge) 세팅 전담
+    useEffect(() => {
+        const fetchConfig = async () => {
+        try {
+            const response = await api.get<{ accessTokenMaxAge: number }>('/auth/config');
+            setMaxAge(response.data.accessTokenMaxAge);
+        } catch (error) {
+            console.error("인증 설정(config)을 가져오는데 실패했습니다.", error);
+        }
+        };
+
+        fetchConfig();
+    }, [setMaxAge]);
 
 
     useEffect(() => {
-        if (isSuccess && user) {
+        if (user) {
+            // 유저 정보를 성공적으로 가져왔다면
             setAuthenticated(true);
         }
+    }, [user, setAuthenticated]);
+
+    useEffect(() => {
         if (isError) {
-            setAuthenticated(false);
+            // 유저 정보를 가져오는 데 완전히 실패시
+            logout();
         }
-    }, [isSuccess, isError, user, setAuthenticated]);
+    }, [isError]);
 
-
-    const handleGoogleLogin = () => {
-        window.location.href = "http://localhost:8080/oauth2/authorization/google";
-        console.log("로그인 성공")
-    }
-    const handleLogout = useLogout();
     
 
 
@@ -77,28 +93,16 @@ function App() {
     };
 
     
+    if (isLoading) {
+        return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>로딩 중...</div>;
+    }
+    
     return (
     
         <>
-        <header>
-            {!isAuthenticated ? (
-                <>
-                    <button style={{backgroundColor: "#3C83F6"}} 
-                    onClick={handleGoogleLogin}
-                    >구글 로그인</button>
-                </>
-            ) : (
-                <>
-                    <button onClick={handleLogout}>로그아웃</button>
-                    <button onClick={() => navigate('/profile')}>마이프로필</button>
-                </>
-            )}
-
-            <button onClick={() => navigate('/')}>홈으로</button>
-        </header>
+        <Header />
         <div>
             <button onClick={() => navigate('/postboard')}>게시판</button>
-            <button onClick={() => navigate('/profile')}>프로필</button>
 
         </div>
         

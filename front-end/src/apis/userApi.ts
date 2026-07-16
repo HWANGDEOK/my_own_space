@@ -23,9 +23,27 @@ api.interceptors.response.use(
     async (error: AxiosError) => {
         const originalRequest = error.config as RetryConfig;
 
+        if (!originalRequest) {
+            return Promise.reject(error);
+        }
+
+        const passUrls = ['/user/me', '/config', '/api/user/me', '/api/config'];
+        const isPass = passUrls.some(url => originalRequest.url?.includes(url));
+        // 만약 실패한 요청 자체가 토큰 재발급(/auth/refresh) 요청인 경우
+        // 또는 이미 한 번 재시도했던 요청이거나, 제외(pass) 대상이 아닌 경우 -> 즉시 로그아웃 처리
+        const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');
+
+
         // refresh 요청 자체가 실패했거나 originalRequest가 없으면 바로 실패 처리 (무한 루프 방지)
-        if (!originalRequest || originalRequest.url?.includes('/auth/refresh')) {
+        if (isRefreshRequest || !originalRequest.retry && !isPass ) {
+            console.log("refresh 요청 실패 했거나 재요청 실패로 로그아웃")
             useAuthStore.getState().logout();
+            useAuthTimer.getState().setTimeLeft(0);
+
+            if (window.location.pathname !== '/') {
+                window.location.href = '/';
+            }
+
             return Promise.reject(error);
         }
 
@@ -35,8 +53,10 @@ api.interceptors.response.use(
 
             try {
                 // 토큰 재발급 요청 (쿠키에 Refresh Token이 담겨 전송된다고 가정)
-                await api.post('/auth/refresh');
+                console.log("액세스 토큰 만료로 인한 재발급 요청 시작...");
 
+                await api.post('/auth/refresh');
+                console.log("재발급 끝, 재시도 요청")
                 // 전역 상태 단순 동기화
                 useAuthStore.getState().setAuthenticated(true);
                 useAuthTimer.getState().resetTimer();
@@ -46,7 +66,11 @@ api.interceptors.response.use(
             } catch (refreshError) {
                 useAuthStore.getState().logout();
                 useAuthTimer.getState().setTimeLeft(0);
+                console.log("재시도 요청 에러")
+                
+                if (window.location.pathname !== '/') {
                 window.location.href = '/';
+            }
                 
                 return Promise.reject(refreshError);
             }

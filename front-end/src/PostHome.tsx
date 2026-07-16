@@ -22,15 +22,7 @@ function PostHome({posts, setPosts}:HomeProps) {
             setIsModalOpen(!isModalOpen)}}>다른거
         </button> */}
 
-        <button onClick={() => {
-            const token = localStorage.getItem('accessToken');
-                if (token) {
-                    navigate('/post/posting')
-                } else {
-                    alert("로그인이 필요합니다.")
-                }
-            }
-        }>게시글 등록</button>
+        <button>게시글 등록</button>
 
         <table style={{ width: '100%', marginTop: '20px', borderCollapse: 'collapse' }}>
             <thead>
