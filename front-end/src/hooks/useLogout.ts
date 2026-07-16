@@ -10,6 +10,7 @@ export function useLogout() {
     return async () => {
         await logout();
         queryClient.removeQueries({ queryKey: ['userMe'] });
+        console.log('로그아웃 성공')
         navigate('/');
     };
 }

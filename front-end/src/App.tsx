@@ -10,6 +10,7 @@ import Profile from "./pages/Profile";
 import { useAuthStore } from "./store/authStore";
 import { useUser } from "./hooks/useUser";
 import { useLogout } from "./hooks/useLogout";
+import Home from "./pages/Home";
 
 function App() {
     const navigate = useNavigate();
@@ -29,7 +30,13 @@ function App() {
         }
     }, [isSuccess, isError, user, setAuthenticated]);
 
+
+    const handleGoogleLogin = () => {
+        window.location.href = "http://localhost:8080/oauth2/authorization/google";
+        console.log("로그인 성공")
+    }
     const handleLogout = useLogout();
+    
 
 
     const [posts, setPosts] = useState<Post[]>([
@@ -77,7 +84,7 @@ function App() {
             {!isAuthenticated ? (
                 <>
                     <button style={{backgroundColor: "#3C83F6"}} 
-                    onClick={() => window.location.href = "http://localhost:8080/oauth2/authorization/google"}
+                    onClick={handleGoogleLogin}
                     >구글 로그인</button>
                 </>
             ) : (
@@ -109,6 +116,7 @@ function App() {
                     addPost={() => addPost()} 
                 />} 
             />
+            <Route path="/" element={<Home />} />
             <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
             <Route path="/profile" element={<Profile />} />
         </Routes>

@@ -22,7 +22,7 @@ function Oauth2RedirectHandler() {
         resetTimer();
         queryClient.invalidateQueries({ queryKey: ['userMe'] });
         navigate('/');
-    }, [navigate]);
+    }, [navigate, setAuthenticated, resetTimer, queryClient]);
 
     return (
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
