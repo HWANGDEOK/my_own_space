@@ -21,5 +21,4 @@ public class UserDto {
         this.nickname = user.getNickname();
         this.role = user.getRole().name();
     }
-
 }

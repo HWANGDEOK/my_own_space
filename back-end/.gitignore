@@ -1,5 +1,10 @@
 application-secret.yaml
 application-prod.yaml
+docker-compose.yml
+bootrun.log
+bootrun.stderr.log
+bootrun.stdout.log
+
 
 HELP.md
 .gradle

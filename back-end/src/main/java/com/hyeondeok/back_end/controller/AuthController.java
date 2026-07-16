@@ -33,7 +33,7 @@ public class AuthController {
 
         AuthService.TokenPair tokenPair = authService.refresh(
                 refreshToken,
-                Duration.ofSeconds(jwtCookieProperties.getAccessTokenMaxAge())
+                Duration.ofSeconds(jwtCookieProperties.getRefreshTokenMaxAge())
         );
 
         tokenCookieService.addTokenCookies(
@@ -46,10 +46,7 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout(
-            HttpServletRequest request,
-            HttpServletResponse response
-    ) {
+    public ResponseEntity<Void> logout(HttpServletRequest request, HttpServletResponse response) {
         CookieUtil.getValue(request, "refresh_token")
                 .ifPresent(authService::logout);
 
@@ -58,8 +55,21 @@ public class AuthController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/csrf")
-    public ResponseEntity<Void> csrf(CsrfToken csrfToken) {
-        return ResponseEntity.noContent().build();
+//    @GetMapping("/csrf")
+//    public ResponseEntity<Void> csrf(CsrfToken csrfToken) {
+//        // Spring Security 6 uses deferred CSRF-token creation. Accessing the value
+//        // materializes it so CookieCsrfTokenRepository writes XSRF-TOKEN to the response.
+//        csrfToken.getToken();
+//        return ResponseEntity.noContent().build();
+//    }
+
+    @GetMapping("/config")
+    public ResponseEntity<AuthConfigResponse> config() {
+        return ResponseEntity.ok(
+                new AuthConfigResponse(jwtCookieProperties.getAccessTokenMaxAge())
+        );
     }
+    public record AuthConfigResponse(long accessTokenMaxAge) {}
+
+
 }

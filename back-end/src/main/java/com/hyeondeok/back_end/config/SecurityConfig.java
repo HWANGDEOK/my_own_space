@@ -39,11 +39,12 @@ public class SecurityConfig {
         http
             // REST API 관련 설정
             .cors(Customizer.withDefaults())
-            .csrf(csrf -> csrf
-                    .csrfTokenRepository(
-                            CookieCsrfTokenRepository.withHttpOnlyFalse()
-                    )
-            )
+            .csrf(AbstractHttpConfigurer::disable)
+//            .csrf(csrf -> csrf
+//                    .csrfTokenRepository(
+//                            CookieCsrfTokenRepository.withHttpOnlyFalse()
+//                    )
+//            )
             .formLogin(AbstractHttpConfigurer::disable)
             .httpBasic(AbstractHttpConfigurer::disable)
 
@@ -57,7 +58,9 @@ public class SecurityConfig {
                             "/login/**",
                             "/api/auth/csrf",
                             "/api/auth/refresh",
+                            "/api/auth/config",
                             "/api/auth/logout",
+                            "/api/user/me",
                             "/error"
                     ).permitAll()
                     .anyRequest().authenticated()

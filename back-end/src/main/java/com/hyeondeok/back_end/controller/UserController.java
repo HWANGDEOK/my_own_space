@@ -21,6 +21,9 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.ok(null);
+        }
         // JwtAuthenticationFilter 에서의 userId 꺼내기
         Long userId = Long.parseLong(userDetails.getUsername());
 
