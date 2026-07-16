@@ -57,8 +57,6 @@ public class AuthController {
 
 //    @GetMapping("/csrf")
 //    public ResponseEntity<Void> csrf(CsrfToken csrfToken) {
-//        // Spring Security 6 uses deferred CSRF-token creation. Accessing the value
-//        // materializes it so CookieCsrfTokenRepository writes XSRF-TOKEN to the response.
 //        csrfToken.getToken();
 //        return ResponseEntity.noContent().build();
 //    }
