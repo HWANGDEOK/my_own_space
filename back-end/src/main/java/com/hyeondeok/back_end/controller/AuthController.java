@@ -7,6 +7,7 @@ import com.hyeondeok.back_end.service.TokenCookieService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.time.Duration;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/api/auth")
@@ -27,9 +29,15 @@ public class AuthController {
 
     @PostMapping("/refresh")
     public ResponseEntity<Void> refresh(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = CookieUtil.getValue(request, "refresh_token")
-                .orElseThrow(() ->
-                        new IllegalArgumentException("refresh token이 없습니다."));
+
+        Optional<String> refreshTokenOpt = CookieUtil.getValue(request, "refresh_token");
+
+        if (refreshTokenOpt.isEmpty()) {
+            // 프론트엔드에 401(인증 필요)을 전송
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        String refreshToken = refreshTokenOpt.get();
 
         AuthService.TokenPair tokenPair = authService.refresh(
                 refreshToken,

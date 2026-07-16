@@ -4,6 +4,7 @@ import com.hyeondeok.back_end.dto.UserDto;
 import com.hyeondeok.back_end.repository.UserRepository;
 import com.hyeondeok.back_end.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +23,7 @@ public class UserController {
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
         if (userDetails == null) {
-            return ResponseEntity.ok(null);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
         // JwtAuthenticationFilter 에서의 userId 꺼내기
         Long userId = Long.parseLong(userDetails.getUsername());
