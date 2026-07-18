@@ -62,13 +62,7 @@ public class AuthController {
 
         return ResponseEntity.noContent().build();
     }
-
-//    @GetMapping("/csrf")
-//    public ResponseEntity<Void> csrf(CsrfToken csrfToken) {
-//        csrfToken.getToken();
-//        return ResponseEntity.noContent().build();
-//    }
-
+    
     @GetMapping("/config")
     public ResponseEntity<AuthConfigResponse> config() {
         return ResponseEntity.ok(

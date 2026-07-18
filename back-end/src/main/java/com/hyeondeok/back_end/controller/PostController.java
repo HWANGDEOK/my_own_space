@@ -18,7 +18,6 @@ public class PostController {
 
     private final PostService postService;
 
-
     /* ==========================================
      * 📋 게시글 관련 API
      * ========================================== */
@@ -29,6 +28,20 @@ public class PostController {
         Long postId = postService.createPost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(postId);
     }
+
+//    @PostMapping
+//    public ResponseEntity<Long> createPost(
+//            @AuthenticationPrincipal UserDetails userDetails,
+//            @RequestBody PostDto.PostDtoReq request) {
+//
+//        if (userDetails == null) {
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+//        }
+//        Long userId = Long.parseLong(userDetails.getUsername());
+//
+//        Long postId = postService.createPost(userId, request);
+//        return ResponseEntity.status(HttpStatus.CREATED).body(postId);
+//    }
 
 
     // 게시글 목록 조회 (최신순, DELETE 제외)

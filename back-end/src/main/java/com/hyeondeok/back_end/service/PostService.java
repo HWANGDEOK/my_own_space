@@ -82,8 +82,4 @@ public class PostService {
 
         return commentRepository.save(comment).getCommentId();
     }
-
-
-
-
 }
