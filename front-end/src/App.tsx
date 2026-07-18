@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Route, Routes } from "react-router-dom";
 import { useNavigate } from 'react-router-dom';
 import OAuth2RedirectHandler from "./pages/Oauth2RedirectHandler";
@@ -10,10 +10,11 @@ import api, { logout } from "./apis/userApi";
 import { useAuthTimer } from "./store/useAuthTimer";
 import Header from "./components/Header";
 import PostListPage from "./pages/PostListPage";
+import PostDetailPage from "./pages/PostDetailPage";
 
 function App() {
     const navigate = useNavigate();
-    const setAuthenticated = useAuthStore((state) => state.setAuthenticated);
+    const setAuth = useAuthStore((state) => state.setAuth);
     const {setMaxAge} = useAuthTimer();
 
     // 최초로드 시 유저정보 가져오기
@@ -38,9 +39,9 @@ function App() {
     useEffect(() => {
         if (user) {
             // 유저 정보를 성공적으로 가져왔다면
-            setAuthenticated(true);
+            setAuth(true);
         }
-    }, [user, setAuthenticated]);
+    }, [user, setAuth]);
 
     useEffect(() => {
         if (isError) {
@@ -68,8 +69,7 @@ function App() {
         
         <Routes>
             <Route path="/postboard" element={<PostListPage />}/>
-            {/* <Route path="/post/:id" element={<PostDetail />} />
-            <Route path="/post/posting" element={<PostCreate />} /> */}
+            <Route path="/posts/:postId" element={<PostDetailPage />} />
             <Route path="/" element={<Home />} />
             <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
             <Route path="/profile" element={<Profile />} />

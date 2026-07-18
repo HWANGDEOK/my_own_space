@@ -7,7 +7,7 @@ import { postApi } from '../apis/postApi';
 
 function PostListPage() {
     const navigate = useNavigate();
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const isAuthenticated = useAuthStore((state) => state.isAuth);
     
     const [posts, setPosts] = useState<PostDtoRes[]>([]);
     const [loading, setLoading] = useState(true);

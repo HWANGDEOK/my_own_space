@@ -20,19 +20,26 @@ function Profile() {
     }, [isError, logout, setTimeLeft]);
 
     if (isLoading) return <div>로딩 중...</div>;
+    if (isError) return null;
 
     return (
         <div style={{ padding: '20px', maxWidth: '400px', margin: '0 auto' }}>
         <h2>마이페이지</h2>
         <hr />
-        {user && (
+        {user ? (
             <div style={{ lineHeight: '2' }}>
                 <p><strong>회원 번호:</strong> {user.userId}</p>
                 <p><strong>이름:</strong> {user.name}</p>
                 <p><strong>닉네임:</strong> {user.nickname}</p>
                 <p><strong>이메일:</strong> {user.email}</p>
             </div>
-        )}
+        ) : (
+            <div>
+                <h2>로그인이 필요합니다.</h2>
+            </div>
+        )
+        
+        }
         </div>
         );
     };
