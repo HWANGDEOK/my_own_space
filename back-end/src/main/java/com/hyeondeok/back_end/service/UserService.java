@@ -21,7 +21,7 @@ public class UserService {
         // 이미 가입된 유저인지 확인
         return userRepository.findByProviderAndProviderId(provider, providerId)
                 .map(existingUser -> {
-                    // 더티 체킹으로 정보 갱신
+                    // 정보 갱신
                     existingUser.updateProfile(name, email);
 
                     return existingUser;
@@ -35,7 +35,6 @@ public class UserService {
                             .name(name)
                             .nickname(nickname)
                             .role(Role.ROLE_USER)
-                            .createdAt(LocalDateTime.now())
                             .build();
 
                     return userRepository.save(newUser);

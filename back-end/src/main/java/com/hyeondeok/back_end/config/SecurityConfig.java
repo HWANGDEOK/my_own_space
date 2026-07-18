@@ -61,6 +61,7 @@ public class SecurityConfig {
                             "/api/auth/config",
                             "/api/auth/logout",
                             "/api/user/me",
+                            "/api/posts/**",
                             "/error"
                     ).permitAll()
                     .anyRequest().authenticated()

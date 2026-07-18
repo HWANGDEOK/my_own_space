@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.AccessLevel;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -33,6 +34,7 @@ public class User {
     @Column(nullable = false)
     private String nickname;
 
+    @CreationTimestamp
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
@@ -55,6 +57,5 @@ public class User {
     public void updateProfile(String name, String email) {
         this.name = name;
         this.email = email;
-        // 닉네임은 최초 랜덤 부여 후 따로 변경할 것이므로 구글 로그인 시점엔 갱신하지 않고 유지합니다.
     }
 }

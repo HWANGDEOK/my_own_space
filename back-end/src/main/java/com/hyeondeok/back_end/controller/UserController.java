@@ -22,6 +22,8 @@ public class UserController {
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
+
+        // 비로그인 -> 401 -> refreshToken 없음 -> 조회 실패
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }

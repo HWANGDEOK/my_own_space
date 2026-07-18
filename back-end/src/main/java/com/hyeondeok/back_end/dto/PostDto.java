@@ -1,20 +1,57 @@
 package com.hyeondeok.back_end.dto;
 
 import com.hyeondeok.back_end.entity.Post;
-import lombok.Data;
 
-@Data
+import java.time.LocalDateTime;
+import java.util.List;
+
 public class PostDto {
-    private Long postId;
-    private String username;
-    private String content;
-    private String date;
+    // 게시글 등록 (요청 받는거)
+    public record PostDtoReq(
+            Long userId,
+            String title,
+            String author,
+            String content
+    ) {}
 
-    public Post toEntity() {
-        Post post = new Post();
-        post.setUsername(this.username);
-        post.setContent(this.content);
+    // 게시글 목록 조회 (응답 하는거)
+    public record PostDtoRes(
+            Long postId,
+            Long userId,
+            String title,
+            String author,
+            LocalDateTime createdAt
+    ) {
+        public static PostDtoRes PostToRes(Post post) {
+            return new PostDtoRes(
+                    post.getPostId(),
+                    post.getUserId(),
+                    post.getTitle(),
+                    post.getAuthor(),
+                    post.getCreatedAt()
+            );
+        }
+    }
 
-        return post;
+    public record PostDetailRes(
+            Long postId,
+            Long userId,
+            String title,
+            String author,
+            String content,
+            LocalDateTime createdAt,
+            List<CommentDto.CommentDtoRes> comments
+    ) {
+        public static PostDetailRes postDetail(Post post, List<CommentDto.CommentDtoRes> filteredComments) {
+            return new PostDetailRes(
+                    post.getPostId(),
+                    post.getUserId(),
+                    post.getTitle(),
+                    post.getAuthor(),
+                    post.getContent(),
+                    post.getCreatedAt(),
+                    filteredComments
+            );
+        }
     }
 }
