@@ -11,6 +11,7 @@ import { useAuthTimer } from "./store/useAuthTimer";
 import Header from "./components/Header";
 import PostListPage from "./pages/PostListPage";
 import PostDetailPage from "./pages/PostDetailPage";
+import PostCreatePage from "./pages/PostCreatePage";
 
 function App() {
     const navigate = useNavigate();
@@ -68,6 +69,7 @@ function App() {
         </div>
         
         <Routes>
+            <Route path="/posts/create" element={<PostCreatePage />}/>
             <Route path="/postboard" element={<PostListPage />}/>
             <Route path="/posts/:postId" element={<PostDetailPage />} />
             <Route path="/" element={<Home />} />

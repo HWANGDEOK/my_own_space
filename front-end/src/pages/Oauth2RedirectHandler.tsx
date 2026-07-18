@@ -21,6 +21,7 @@ function Oauth2RedirectHandler() {
         setAuth(true);
         resetTimer();
         queryClient.invalidateQueries({ queryKey: ['userMe'] });
+        console.log("로그인 성공")
         navigate('/');
     }, [navigate, setAuth, resetTimer, queryClient]);
 

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 import type { PostDtoRes } from '../types/post';
@@ -7,7 +7,7 @@ import { postApi } from '../apis/postApi';
 
 function PostListPage() {
     const navigate = useNavigate();
-    const isAuthenticated = useAuthStore((state) => state.isAuth);
+    const isAuth = useAuthStore((state) => state.isAuth);
     
     const [posts, setPosts] = useState<PostDtoRes[]>([]);
     const [loading, setLoading] = useState(true);
@@ -33,7 +33,7 @@ function PostListPage() {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
                 <h2 style={{ margin: 0 }}>📋 게시판 목록</h2>
                 {/* 로그인 상태일 때만 글쓰기 버튼 활성화 */}
-                {isAuthenticated && (
+                {isAuth && (
                     <button 
                         onClick={() => navigate('/posts/create')} 
                         style={{ padding: '8px 16px', backgroundColor: '#28a745', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', fontWeight: 'bold' }}

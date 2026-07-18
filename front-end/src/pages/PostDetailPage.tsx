@@ -60,7 +60,7 @@ function PostDetailPage() {
             setCommentContent('');
             fetchDetail();
         } catch (error) {
-            console.error(error);
+            console.log(error);
             alert('댓글 등록에 실패했습니다.');
         }
     };

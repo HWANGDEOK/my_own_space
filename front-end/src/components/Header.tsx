@@ -8,24 +8,24 @@ import { useLogout } from "../hooks/useLogout";
 
 function Header() {
     const navigate = useNavigate();
-    const { isAuthenticated, logout } = useAuthStore();
+    const { isAuth, logout } = useAuthStore();
     const { timeLeft, maxAge, decrementTime, resetTimer, setTimeLeft } = useAuthTimer();
 
     // 카운트다운 인터벌 관리
     useEffect(() => {
         // 비로그인이거나 서버 스펙(maxAge)이 아직 준비되지 않았다면 타이머 정지
-        if (!isAuthenticated || maxAge <= 0) return;
+        if (!isAuth || maxAge <= 0) return;
 
         const interval = setInterval(() => {
         decrementTime();
         }, 1000);
 
         return () => clearInterval(interval);
-    }, [isAuthenticated, maxAge, decrementTime]);
+    }, [isAuth, maxAge, decrementTime]);
 
     // 시간이 0이 되었을 때 Refresh 자동 요청
     useEffect(() => {
-        if (isAuthenticated && maxAge > 0 && timeLeft === 0) {
+        if (isAuth && maxAge > 0 && timeLeft === 0) {
         const handleSilentRefresh = async () => {
             try {
                 console.log("타이머가 0초가 되어 세션 연장을 시도합니다.");
@@ -38,7 +38,7 @@ function Header() {
 
         handleSilentRefresh();
         }
-    }, [timeLeft, isAuthenticated, maxAge, resetTimer]);
+    }, [timeLeft, isAuth, maxAge, resetTimer]);
 
     // 초 단위를 '분:초' 형태로 변환해 주는 헬퍼 함수 (예: 120 -> 02:00)
     const formatTime = (seconds: number) => {
@@ -55,7 +55,7 @@ function Header() {
 
     return (
         <header>
-            {!isAuthenticated ? (
+            {!isAuth ? (
                 <>
                     <button style={{backgroundColor: "#3C83F6", color: 'white', border: 'none', padding: '8px 12px', borderRadius: '4px', cursor: 'pointer'}} 
                     onClick={handleGoogleLogin}

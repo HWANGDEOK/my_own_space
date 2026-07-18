@@ -22,7 +22,7 @@ export const postApi = {
 
     // 댓글/대댓글 생성
     createComment: async (postId: number, data: CommentDtoReq): Promise<number> => {
-        const response = await api.post<number>(`/api/posts/${postId}/comments`, data);
+        const response = await api.post<number>(`/posts/${postId}/comments`, data);
         return response.data;
     }
 };

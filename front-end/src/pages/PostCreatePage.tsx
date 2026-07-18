@@ -37,8 +37,8 @@ function PostCreatePage() {
             await postApi.createPost({
                 title,
                 content,
-                author: user.nickname || user.name, // Profile 참고: nickname 우선 사용
-                userId: user.userId // Profile 참고: user.userId 사용
+                author: user.nickname,
+                userId: user.userId
             });
             alert('게시글이 등록되었습니다.');
             navigate('/posts');
