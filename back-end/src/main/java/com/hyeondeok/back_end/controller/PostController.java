@@ -18,9 +18,6 @@ public class PostController {
 
     private final PostService postService;
 
-    /* ==========================================
-     * 📋 게시글 관련 API
-     * ========================================== */
 
     // 게시글 생성
     @PostMapping
@@ -51,18 +48,16 @@ public class PostController {
         return ResponseEntity.ok(posts);
     }
 
-    // 3. 게시글 상세 조회 (필터링된 대댓글 계층 목록 포함)
+    // 게시글 상세 조회 (필터링된 대댓글 목록 포함)
     @GetMapping("/{postId}")
     public ResponseEntity<PostDto.PostDetailRes> getPostDetail(@PathVariable("postId") Long postId) {
         PostDto.PostDetailRes postDetail = postService.getPostDetail(postId);
         return ResponseEntity.ok(postDetail);
     }
 
-    /* ==========================================
-     * 💬 댓글 / 대댓글 관련 API
-     * ========================================== */
 
-    // 4. 댓글 및 대댓글 생성
+
+    // 댓글 및 대댓글 생성
     // 일반 댓글 등록 시: parentId를 null로 전송
     // 대댓글 등록 시: parentId에 부모 댓글 ID를 포함하여 전송
     @PostMapping("/{postId}/comments")
