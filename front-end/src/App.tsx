@@ -13,6 +13,8 @@ import PostListPage from "./pages/PostListPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostCreatePage from "./pages/PostCreatePage";
 import PostEditPage from "./pages/PostEditPage";
+import AdminLogin from "./pages/AdminLogin";
+import { adminApi } from "./apis/adminApi";
 
 function App() {
     const navigate = useNavigate();
@@ -53,7 +55,16 @@ function App() {
     }, [isError]);
 
     
+    const handleAdminDeactivate = async () => {
 
+        try {
+            await adminApi.deactivateAdmin()
+            window.location.href = '/';
+        } catch (error) {
+            console.error('관리자모드 비활성화 실패')
+        }
+
+    }
 
     
     if (isLoading) {
@@ -66,7 +77,11 @@ function App() {
         <Header />
         <div>
             <button onClick={() => navigate('/postboard')}>게시판</button>
-
+            {user?.role === 'ROLE_ADMIN' && (
+                <div>
+                    <button onClick={handleAdminDeactivate}>관리자모드 비활성화</button>
+                </div>
+            )}
         </div>
         
         <Routes>
@@ -77,6 +92,8 @@ function App() {
             <Route path="/" element={<Home />} />
             <Route path="/oauth2/redirect" element={<OAuth2RedirectHandler />} />
             <Route path="/profile" element={<Profile />} />
+            <Route path="/admin/activate" element={<AdminLogin />} />
+
         </Routes>
         </>
     )

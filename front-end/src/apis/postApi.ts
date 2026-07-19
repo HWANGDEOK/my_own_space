@@ -27,11 +27,8 @@ export const postApi = {
     },
 
     // 게시글 삭제
-    deletePost: async (postId: number, userId: number): Promise<void> => {
-        // @RequestParam으로 userId를 받으므로 params 옵션을 사용합니다.
-        await api.delete<void>(`/posts/${postId}`, {
-            params: { userId }
-        });
+    deletePost: async (postId: number): Promise<void> => {
+        await api.delete<void>(`/posts/${postId}`);
     },
 
 

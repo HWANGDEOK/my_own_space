@@ -29,6 +29,7 @@ api.interceptors.response.use(
 
         const passUrls = ['/auth/config'];
         const isPass = passUrls.some(url => originalRequest.url?.includes(url));
+        
         // 만약 실패한 요청 자체가 토큰 재발급(/auth/refresh) 요청인 경우
         // 또는 이미 한 번 재시도했던 요청이거나, 제외(pass) 대상이 아닌 경우 -> 즉시 로그아웃 처리
         const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');

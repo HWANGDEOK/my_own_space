@@ -54,7 +54,7 @@ function PostDetailPage() {
         if (!window.confirm('정말 이 게시글을 삭제하시겠습니까?')) return;
 
         try {
-            await postApi.deletePost(Number(postId), Number(user?.userId)); 
+            await postApi.deletePost(Number(postId)); 
             alert('게시글이 삭제되었습니다.');
             navigate('/postboard');
         } catch (error) {
@@ -144,6 +144,16 @@ function PostDetailPage() {
     if (loading) return <div style={{ textAlign: 'center', padding: '40px' }}>본문을 불러오는 중입니다...</div>;
     if (!post) return null;
 
+    const actionBtnStyle: React.CSSProperties = {
+        fontSize: '12px',
+        background: 'none',
+        border: 'none',
+        color: '#666',
+        cursor: 'pointer',
+        padding: '5px 0 0 0',
+        fontWeight: 'normal',
+        marginLeft: '10px'
+    };
     const isMyPost = user && user.userId === post.userId;
 
     return (
@@ -161,23 +171,25 @@ function PostDetailPage() {
                     <span style={{}}>|</span>
                     작성일: {new Date(post.createdAt).toLocaleString()}
                 </div>
-                {/* 💡 본인 게시글일 경우에만 수정/삭제 버튼 노출 */}
+                {/* 본인 게시글일 경우에만 수정/삭제 버튼 노출 */}
+                <div style={{ display: 'flex', gap: '5px' }}>
                     {isMyPost && (
-                        <div style={{ display: 'flex', gap: '5px' }}>
                             <button 
                                 onClick={() => navigate(`/posts/${postId}/edit`)} //
                                 style={{ ...actionBtnStyle, padding: '2px 6px', border: '1px solid #ccc', borderRadius: '4px' }}
                             >
                                 수정
                             </button>
-                            <button 
-                                onClick={handleDeletePost} 
-                                style={{ ...actionBtnStyle, padding: '2px 6px', border: '1px solid #dc3545', color: '#dc3545', borderRadius: '4px' }}
-                            >
-                                삭제
-                            </button>
-                        </div>
                     )}
+                        {(isMyPost || user?.role === 'ROLE_ADMIN') && (
+                        <button 
+                            onClick={handleDeletePost} 
+                            style={{ ...actionBtnStyle, padding: '2px 6px', border: '1px solid #dc3545', color: '#dc3545', borderRadius: '4px' }}
+                        >
+                            삭제
+                        </button>
+                    )}
+                </div>
             </div>
             
             {/* 본문 내용 */}
@@ -196,7 +208,7 @@ function PostDetailPage() {
                         const isEditing = editingCommentId === comment.commentId;
 
                         return (
-                            /* 📦 1. 부모와 자식 대댓글을 통째로 감싸는 하나의 "댓글 그룹 카드" */
+                            /*  부모와 자식 대댓글 "댓글 그룹 카드" */
                             <div 
                                 key={comment.commentId} 
                                 style={{ 
@@ -207,7 +219,7 @@ function PostDetailPage() {
                                     boxShadow: '0 1px 3px rgba(0,0,0,0.02)'
                                 }}
                             >
-                                {/* 👤 2. 부모 댓글 영역 */}
+                                {/* 부모 댓글 영역 */}
                                 <div style={{ 
                                     borderBottom: comment.childrenComment?.length > 0 || replyTargetId === comment.commentId ? '1px dashed #eee' : 'none', 
                                     paddingBottom: comment.childrenComment?.length > 0 || replyTargetId === comment.commentId ? '12px' : '0' 
@@ -255,8 +267,7 @@ function PostDetailPage() {
                                     )}
                                 </div>
 
-                                {/* 👪 3. 부모 내부로 들어온 자식 대댓글(답글) 리스트 영역 */}
-                                {/* 💡 comment.childrenComments 대신, 위에서 정의한 replies 배열을 사용합니다. */}
+                                {/* 부모 내부로 들어온 자식 대댓글(답글) 리스트 영역 */}
                                 {comment.childrenComment?.length > 0 && (
                                     <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginTop: '12px', paddingLeft: '15px' }}>
                                         {comment.childrenComment?.map((reply: CommentDtoRes) => {
@@ -292,13 +303,15 @@ function PostDetailPage() {
                                                         </div>
                                                     ) : (
                                                         <>
-                                                            <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#444', whiteSpace: 'pre-wrap' }}>{reply.content}</p>
-                                                            {isMyReply && (
-                                                                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                                                                    <button onClick={() => startEditing(reply.commentId, reply.content)} style={{ ...actionBtnStyle, marginLeft: 0 }}>[수정]</button>
+                                                            <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                                                                <p style={{ margin: '4px 0 0 0', fontSize: '13px', color: '#444', whiteSpace: 'pre-wrap' }}>{reply.content}</p>
+                                                                {isMyReply && (
+                                                                        <button onClick={() => startEditing(reply.commentId, reply.content)} style={{ ...actionBtnStyle, marginLeft: 0 }}>[수정]</button>
+                                                                )}
+                                                                {(isMyReply || user?.role === 'ROLE_ADMIN') && (
                                                                     <button onClick={() => handleDeleteComment(reply.commentId)} style={{ ...actionBtnStyle, color: '#dc3545' }}>[삭제]</button>
-                                                                </div>
-                                                            )}
+                                                                )}
+                                                            </div>
                                                         </>
                                                     )}
                                                 </div>
@@ -307,7 +320,7 @@ function PostDetailPage() {
                                     </div>
                                 )}
 
-                                {/* 📝 4. 부모 내부로 들어온 대댓글 입력 폼 */}
+                                {/* 부모 내부로 들어온 대댓글 입력 */}
                                 {replyTargetId === comment.commentId && (
                                     <div style={{ marginTop: '12px', paddingLeft: '15px', display: 'flex', gap: '10px' }}>
                                         <input 
@@ -359,16 +372,3 @@ function PostDetailPage() {
 }
 
 export default PostDetailPage;
-
-
-
-const actionBtnStyle: React.CSSProperties = {
-    fontSize: '12px',
-    background: 'none',
-    border: 'none',
-    color: '#666',
-    cursor: 'pointer',
-    padding: '5px 0 0 0',
-    fontWeight: 'normal',
-    marginLeft: '10px'
-};
