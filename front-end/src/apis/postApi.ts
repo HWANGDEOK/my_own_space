@@ -1,4 +1,4 @@
-import type {CommentDtoReq, PostDetailRes, PostDtoReq, PostDtoRes, } from "../types/post";
+import type {CommentDtoReq, CommentDtoUpdateReq, PostDetailRes, PostDtoReq, PostDtoRes, PostUpdateReq, } from "../types/post";
 import api from "./userApi";
 
 export const postApi = {
@@ -20,9 +20,39 @@ export const postApi = {
         return response.data;
     },
 
+    // 게시글 수정
+    updatePost: async (postId: number, data: PostUpdateReq): Promise<number> => {
+        const response = await api.put<number>(`/posts/${postId}`, data);
+        return response.data;
+    },
+
+    // 게시글 삭제
+    deletePost: async (postId: number, userId: number): Promise<void> => {
+        // @RequestParam으로 userId를 받으므로 params 옵션을 사용합니다.
+        await api.delete<void>(`/posts/${postId}`, {
+            params: { userId }
+        });
+    },
+
+
+
+
     // 댓글/대댓글 생성
     createComment: async (postId: number, data: CommentDtoReq): Promise<number> => {
         const response = await api.post<number>(`/posts/${postId}/comments`, data);
+        return response.data;
+    },
+
+
+    // 댓글 수정
+    updateComment: async (commentId: number, data: CommentDtoUpdateReq): Promise<string> => {
+        const response = await api.put<string>(`/posts/comments/${commentId}`, data);
+        return response.data;
+    },
+
+    // 댓글 삭제
+    deleteComment: async (commentId: number): Promise<string> => {
+        const response = await api.delete<string>(`/posts/comments/${commentId}`);
         return response.data;
     }
 };

@@ -12,6 +12,7 @@ import Header from "./components/Header";
 import PostListPage from "./pages/PostListPage";
 import PostDetailPage from "./pages/PostDetailPage";
 import PostCreatePage from "./pages/PostCreatePage";
+import PostEditPage from "./pages/PostEditPage";
 
 function App() {
     const navigate = useNavigate();
@@ -70,6 +71,7 @@ function App() {
         
         <Routes>
             <Route path="/posts/create" element={<PostCreatePage />}/>
+            <Route path="/posts/:postId/edit" element={<PostEditPage />} />
             <Route path="/postboard" element={<PostListPage />}/>
             <Route path="/posts/:postId" element={<PostDetailPage />} />
             <Route path="/" element={<Home />} />

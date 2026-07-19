@@ -1,26 +1,55 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useUser } from '../hooks/useUser';
 import { useAuthStore } from '../store/authStore';
 import { postApi } from '../apis/postApi';
 
-
-function PostCreatePage() {
+function PostEditPage() {
+    const { postId } = useParams<{ postId: string }>();
     const navigate = useNavigate();
     const { data: user } = useUser();
     const isAuth = useAuthStore((state) => state.isAuth);
 
     const [title, setTitle] = useState('');
     const [content, setContent] = useState('');
+    const [loading, setLoading] = useState(true);
 
-    // 비로그인 사용자가 접근했을 때 차단 처리
+    // 비로그인 사용자 접근 차단 및 기존 게시글 데이터 불러오기
     useEffect(() => {
         if (!isAuth) {
             alert('로그인이 필요한 서비스입니다.');
             navigate('/');
+            return;
         }
-    }, [isAuth, navigate]);
 
+        const fetchPostDetail = async () => {
+            if (!postId) return;
+            try {
+                const data = await postApi.getPostDetail(Number(postId));
+                
+                if (user && data.userId !== user.userId) {
+                    alert('본인의 게시글만 수정할 수 있습니다.');
+                    navigate('/postboard');
+                    return;
+                }
+
+                setTitle(data.title);
+                setContent(data.content);
+            } catch (error) {
+                console.error('수정할 게시글 조회 실패:', error);
+                alert('게시글을 불러오는데 실패했습니다.');
+                navigate('/postboard');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (user) {
+            fetchPostDetail();
+        }
+    }, [isAuth, navigate, postId, user]);
+
+    // 수정 완료
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -34,24 +63,25 @@ function PostCreatePage() {
         }
 
         try {
-            await postApi.createPost({
+            await postApi.updatePost(Number(postId), {
                 title,
                 content,
-                author: user.nickname,
                 userId: user.userId
             });
-            alert('게시글이 등록되었습니다.');
-            navigate('/postboard');
+            alert('게시글이 수정되었습니다.');
+            navigate(`/posts/${postId}`);
 
         } catch (error) {
             console.error(error);
-            alert('게시글 등록에 실패했습니다.');
+            alert('게시글 수정에 실패했습니다.');
         }
     };
 
+    if (loading) return <div style={{ textAlign: 'center', padding: '40px' }}>기존 내용을 불러오는 중입니다...</div>;
+
     return (
         <div style={{ padding: '20px', maxWidth: '700px', margin: '0 auto' }}>
-            <h2>✍️ 새 게시글 작성</h2>
+            <h2>✏️ 게시글 수정</h2>
             <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <input
                     type="text"
@@ -71,11 +101,11 @@ function PostCreatePage() {
                     <button type="button" onClick={() => navigate(-1)} style={{ padding: '10px 20px', cursor: 'pointer' }}>취소</button>
                     <button type="submit"
                     style={{ padding: '10px 20px', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>
-                        등록</button>
+                        수정 완료</button>
                 </div>
             </form>
         </div>
     );
 }
 
-export default PostCreatePage;
+export default PostEditPage;
