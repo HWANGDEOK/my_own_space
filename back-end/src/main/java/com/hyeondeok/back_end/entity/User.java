@@ -19,19 +19,22 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(nullable = false)
-    private String provider; // google
+    @Column
+    private String password;
 
-    @Column(nullable = false)
+    @Column
+    private String provider;
+
+    @Column
     private String providerId;
 
-    @Column(nullable = false)
+    @Column
     private String email;
 
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
+    @Column
     private String nickname;
 
     @CreationTimestamp

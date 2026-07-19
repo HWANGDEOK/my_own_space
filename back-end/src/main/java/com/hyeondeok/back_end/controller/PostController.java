@@ -26,20 +26,6 @@ public class PostController {
         return ResponseEntity.status(HttpStatus.CREATED).body(postId);
     }
 
-//    @PostMapping
-//    public ResponseEntity<Long> createPost(
-//            @AuthenticationPrincipal UserDetails userDetails,
-//            @RequestBody PostDto.PostDtoReq request) {
-//
-//        if (userDetails == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
-//        Long userId = Long.parseLong(userDetails.getUsername());
-//
-//        Long postId = postService.createPost(userId, request);
-//        return ResponseEntity.status(HttpStatus.CREATED).body(postId);
-//    }
-
 
     // 게시글 목록 조회 (최신순, DELETE 제외)
     @GetMapping
@@ -54,6 +40,27 @@ public class PostController {
         PostDto.PostDetailRes postDetail = postService.getPostDetail(postId);
         return ResponseEntity.ok(postDetail);
     }
+
+    // 게시글 수정
+    @PutMapping("/{postId}")
+    public ResponseEntity<Long> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostDto.PostUpdateReq request) {
+
+        Long updatedPostId = postService.updatePost(postId, request);
+        return ResponseEntity.ok(updatedPostId);
+    }
+
+    // 게시글 삭제
+    @DeleteMapping("/{postId}")
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @RequestParam Long userId) {
+
+        postService.deletePost(postId, userId);
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 
@@ -70,4 +77,35 @@ public class PostController {
     }
 
 
+
+    // 댓글 수정
+    @PutMapping("/comments/{commentId}")
+    public ResponseEntity<String> updateComment(
+            @PathVariable("commentId") Long commentId,
+            @RequestBody CommentDto.CommentDtoUpdateReq request) {
+
+        try {
+            postService.updateComment(commentId, request);
+            return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 수정 중 오류가 발생했습니다.");
+        }
+    }
+
+    // 댓글 삭제
+    @DeleteMapping("/comments/{commentId}")
+    public ResponseEntity<String> deleteComment(
+            @PathVariable("commentId") Long commentId) {
+
+        try {
+            postService.deleteComment(commentId);
+            return ResponseEntity.ok("댓글이 성공적으로 삭제되었습니다.");
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 삭제 중 오류가 발생했습니다.");
+        }
+    }
 }

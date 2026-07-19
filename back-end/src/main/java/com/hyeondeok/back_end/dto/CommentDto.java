@@ -42,5 +42,8 @@ public class CommentDto {
         }
     }
 
+    public record CommentDtoUpdateReq(
+            String content
+    ) {}
 
 }

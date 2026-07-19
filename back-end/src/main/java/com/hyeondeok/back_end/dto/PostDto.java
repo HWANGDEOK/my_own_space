@@ -54,4 +54,10 @@ public class PostDto {
             );
         }
     }
+
+    public record PostUpdateReq(
+            Long userId,        // 작성자 ID
+            String title,       // 수정할 제목
+            String content      // 수정할 내용
+    ) {}
 }

@@ -23,23 +23,6 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-//    @GetMapping("/me")
-//    public ResponseEntity<UserDto> getUserInfo(@AuthenticationPrincipal UserDetails userDetails) {
-//
-//        // 비로그인 -> 401 -> refreshToken 없음 -> 조회 실패
-//        if (userDetails == null) {
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
-//        }
-//        // JwtAuthenticationFilter 에서의 userId 꺼내기
-//        Long userId = Long.parseLong(userDetails.getUsername());
-//
-//        // 유저 조회 후 UserDto 프론트로 리턴
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
-//
-//        return ResponseEntity.ok(new UserDto(user));
-//    }
-
     @GetMapping("/me")
     public ResponseEntity<UserDto> getUserInfo(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -70,4 +53,5 @@ public class UserController {
         // 프론트엔드가 401 -> /auth/refresh 요청
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
     }
+
 }

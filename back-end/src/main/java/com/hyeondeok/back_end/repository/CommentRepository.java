@@ -9,5 +9,5 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     List<Comment> findByPost_PostIdAndStateOrderByCommentIdAsc(Long postId, PostState state);
-    List<Comment> findByPost_PostIdAndParentIsNullAndStateOrderByCommentIdAsc(Long postId, PostState state);
+    List<Comment> findByPost_PostIdAndStateAndParentIsNullOrderByCommentIdAsc(Long postId, PostState state);
 }

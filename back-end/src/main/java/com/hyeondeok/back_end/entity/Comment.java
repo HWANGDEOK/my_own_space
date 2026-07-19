@@ -30,7 +30,7 @@ public class Comment {
     private Comment parent;
 
     // 자식 댓글들: 하나의 댓글 아래에 여러 대댓글이 올 수 있으므로 1:N 매핑
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Comment> childrenComments = new ArrayList<>();
 
     @Column(name = "user_id", nullable = false)
@@ -51,11 +51,23 @@ public class Comment {
     private LocalDateTime createdAt;
 
     @Builder
-    public Comment(Post post, String content, String author, Long userId) {
+    public Comment(Post post, Comment parent, String content, String author, Long userId) {
         this.post = post;
+        this.parent = parent;
         this.content = content;
         this.author = author;
         this.userId = userId;
         this.state = PostState.POST;
+    }
+
+    public void updateCommentContent(String content) {
+        if (content == null || content.trim().isEmpty()) {
+            throw new IllegalArgumentException("댓글 내용은 공백일 수 없습니다.");
+        }
+        this.content = content;
+    }
+
+    public void updateCommentState(PostState state) {
+        this.state = state;
     }
 }

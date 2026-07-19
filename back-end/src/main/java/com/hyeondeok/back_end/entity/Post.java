@@ -53,4 +53,12 @@ public class Post {
         this.state = PostState.POST;
     }
 
+
+    public void updatePost(String title, String content) {
+        this.title = title;
+        this.content = content;
+    }
+    public void updatePostState(PostState state) {
+        this.state = state;
+    }
 }

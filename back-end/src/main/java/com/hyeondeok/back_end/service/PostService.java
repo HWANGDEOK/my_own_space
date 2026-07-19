@@ -49,13 +49,44 @@ public class PostService {
 
         // 해당 게시글에 매핑된 댓글 중 'POST' 상태인 것만 등록순(오름차순)으로 조회
         List<CommentDto.CommentDtoRes> comments = commentRepository
-                .findByPost_PostIdAndStateOrderByCommentIdAsc(postId, PostState.POST)
+                .findByPost_PostIdAndStateAndParentIsNullOrderByCommentIdAsc(postId, PostState.POST)
                 .stream()
                 .map(CommentDto.CommentDtoRes::CommentToRes)
                 .collect(Collectors.toList());
 
         return PostDto.PostDetailRes.postDetail(post, comments);
     }
+
+    // 게시글 수정
+    @Transactional
+    public Long updatePost(Long postId, PostDto.PostUpdateReq request) {
+        Post post = postRepository.findById(postId)
+                .filter(p -> p.getState() == PostState.POST)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않거나 이미 삭제되었습니다."));
+
+        if (!post.getUserId().equals(request.userId())) {
+            throw new IllegalArgumentException("게시글 수정 권한이 없습니다.");
+        }
+
+        post.updatePost(request.title(), request.content());
+
+        return post.getPostId();
+    }
+
+    // 게시글 삭제
+    @Transactional
+    public void deletePost(Long postId, Long userId) {
+        Post post = postRepository.findById(postId)
+                .filter(p -> p.getState() == PostState.POST)
+                .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않거나 이미 삭제되었습니다."));
+
+        if (!post.getUserId().equals(userId)) {
+            throw new IllegalArgumentException("게시글 삭제 권한이 없습니다.");
+        }
+
+        post.updatePostState(PostState.DELETE);
+    }
+
 
 
     // 댓글 등록
@@ -75,11 +106,33 @@ public class PostService {
 
         Comment comment = Comment.builder()
                 .post(post)
+                .parent(parent)
                 .userId(request.userId())
                 .author(request.author())
                 .content(request.content())
                 .build();
 
         return commentRepository.save(comment).getCommentId();
+    }
+
+
+    // 댓글 수정
+    @Transactional
+    public void updateComment(Long commentId, CommentDto.CommentDtoUpdateReq request) {
+        Comment comment = commentRepository.findById(commentId)
+                .filter(c -> c.getState() == PostState.POST)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 삭제된 댓글입니다."));
+
+        comment.updateCommentContent(request.content());
+    }
+
+    // 댓글 상태를 DELETE로 업데이트
+    @Transactional
+    public void deleteComment(Long commentId) {
+        Comment comment = commentRepository.findById(commentId)
+                .filter(c -> c.getState() == PostState.POST)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 이미 삭제된 댓글입니다."));
+
+        comment.updateCommentState(PostState.DELETE);
     }
 }
