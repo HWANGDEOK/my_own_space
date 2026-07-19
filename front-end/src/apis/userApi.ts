@@ -3,6 +3,7 @@ import type { UserInfo } from '../types/user';
 
 import { useAuthStore } from '../store/authStore';
 import { useAuthTimer } from '../store/useAuthTimer';
+import forceLogout from '../util/logoutUtil';
 
 
 
@@ -27,41 +28,51 @@ api.interceptors.response.use(
             return Promise.reject(error);
         }
 
+        // 401이 아니면 (400, 403, 409, 500 등) 그대로 호출부로 전달
+        // -> deletePost의 catch, 회원가입 폼의 catch 등에서 각자 알아서 처리
+        if (error.response?.status !== 401) {
+            return Promise.reject(error);
+        }
+        
         const passUrls = ['/auth/config'];
         const isPass = passUrls.some(url => originalRequest.url?.includes(url));
+        if (isPass) {
+            return Promise.reject(error);
+        }
         
         // 만약 실패한 요청 자체가 토큰 재발급(/auth/refresh) 요청인 경우
         // 또는 이미 한 번 재시도했던 요청이거나, 제외(pass) 대상이 아닌 경우 -> 즉시 로그아웃 처리
         const isRefreshRequest = originalRequest.url?.includes('/auth/refresh');
 
-
-        // refresh 요청 자체가 실패했거나 originalRequest가 없으면 바로 실패 처리
-        if (isRefreshRequest || !originalRequest.retry && !isPass ) {
-            console.log("refresh 요청 실패 했거나 재요청 실패로 로그아웃")
-            useAuthStore.getState().logout();
-            useAuthTimer.getState().setTimeLeft(0);
-
-
-            if (window.location.pathname !== '/') {
-                window.location.href = '/';
-            }
+        if (isRefreshRequest) {
+            forceLogout();
             return Promise.reject(error);
         }
 
-        // 401 에러가 발생
-        if (error.response?.status === 401) {
-            if (isPass) {
-                return Promise.reject(error);
-            }   
-        }
-        // 재시도 401 에러 발생하면 그냥 로그아웃 처리
+        // // refresh 요청 자체가 실패했거나 originalRequest가 없으면 바로 실패 처리
+        // if (isRefreshRequest || !originalRequest.retry && !isPass ) {
+        //     console.log("refresh 요청 실패 했거나 재요청 실패로 로그아웃")
+        //     useAuthStore.getState().logout();
+        //     useAuthTimer.getState().setTimeLeft(0);
+
+
+        //     if (window.location.pathname !== '/') {
+        //         window.location.href = '/';
+        //     }
+        //     return Promise.reject(error);
+        // }
+
+        // // 401 에러가 발생
+        // if (error.response?.status === 401) {
+        //     if (isPass) {
+        //         return Promise.reject(error);
+        //     }   
+        // }
+        
+        // 재시도 401 에러 발생하면 그냥 로그아웃
         if (originalRequest.retry) {
             console.log("재시도 요청마저 401 실패 - 강제 로그아웃 처리");
-            useAuthStore.getState().logout();
-            useAuthTimer.getState().setTimeLeft(0);
-            if (window.location.pathname !== '/') {
-                window.location.href = '/';
-            }
+            forceLogout()
 
             return Promise.reject(error);
         }
@@ -71,9 +82,9 @@ api.interceptors.response.use(
         try {
             // 토큰 재발급 요청
             console.log("액세스 토큰 만료로 인한 재발급 요청 시작...");
-
             await api.post('/auth/refresh');
             console.log("재발급 끝, 재시도 요청")
+
             // 전역 상태 단순 동기화
             useAuthStore.getState().setAuth(true);
             useAuthTimer.getState().resetTimer();
@@ -81,19 +92,11 @@ api.interceptors.response.use(
             // 원래 보냈던 요청 재시도
             return api(originalRequest);
         } catch (refreshError) {
-            useAuthStore.getState().logout();
-            useAuthTimer.getState().setTimeLeft(0);
-            console.log("재시도 요청 에러")
-            
-            if (window.location.pathname !== '/') {
-                window.location.href = '/';
-            }
-            
+            forceLogout()
             return Promise.reject(refreshError);
         }
     }
 );
-
 
 
 // 정보 조회
