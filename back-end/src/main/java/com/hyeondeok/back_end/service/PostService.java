@@ -8,6 +8,7 @@ import com.hyeondeok.back_end.entity.PostState;
 import com.hyeondeok.back_end.repository.CommentRepository;
 import com.hyeondeok.back_end.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -75,13 +76,15 @@ public class PostService {
 
     // 게시글 삭제
     @Transactional
-    public void deletePost(Long postId, Long userId) {
+    public void deletePost(Long postId, Long requesterId, boolean isAdmin) {
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getState() == PostState.POST)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않거나 이미 삭제되었습니다."));
 
-        if (!post.getUserId().equals(userId)) {
-            throw new IllegalArgumentException("게시글 삭제 권한이 없습니다.");
+        boolean isOwner = post.getUserId().equals(requesterId);
+
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException("게시글을 삭제할 권한이 없습니다.");
         }
 
         post.updatePostState(PostState.DELETE);
@@ -128,10 +131,16 @@ public class PostService {
 
     // 댓글 상태를 DELETE로 업데이트
     @Transactional
-    public void deleteComment(Long commentId) {
+    public void deleteComment(Long commentId, Long requesterId, boolean isAdmin) {
         Comment comment = commentRepository.findById(commentId)
                 .filter(c -> c.getState() == PostState.POST)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않거나 이미 삭제된 댓글입니다."));
+
+        boolean isOwner = comment.getUserId().equals(requesterId);
+
+        if (!isAdmin && !isOwner) {
+            throw new AccessDeniedException("게시글을 삭제할 권한이 없습니다.");
+        }
 
         comment.updateCommentState(PostState.DELETE);
     }

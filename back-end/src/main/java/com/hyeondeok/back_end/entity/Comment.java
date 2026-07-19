@@ -30,7 +30,7 @@ public class Comment {
     private Comment parent;
 
     // 자식 댓글들: 하나의 댓글 아래에 여러 대댓글이 올 수 있으므로 1:N 매핑
-    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Comment> childrenComments = new ArrayList<>();
 
     @Column(name = "user_id", nullable = false)

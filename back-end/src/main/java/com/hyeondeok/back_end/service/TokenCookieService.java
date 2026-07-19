@@ -17,7 +17,7 @@ public class TokenCookieService {
     public void addTokenCookies(HttpServletResponse response, String accessToken, String refreshToken) {
         ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
                 .httpOnly(true)
-                .secure(jwtCookieProperties.isSecure()) // 운영 HTTPS에서는 반드시 true
+                .secure(jwtCookieProperties.isSecure())
                 .sameSite("Lax")
                 .path("/")
                 .maxAge(Duration.ofSeconds(jwtCookieProperties.getAccessTokenMaxAge()))
@@ -25,15 +25,26 @@ public class TokenCookieService {
 
         ResponseCookie refreshCookie = ResponseCookie.from("refresh_token", refreshToken)
                 .httpOnly(true)
-                .secure(jwtCookieProperties.isSecure()) // 운영 HTTPS에서는 반드시 true
+                .secure(jwtCookieProperties.isSecure())
                 .sameSite("Strict")
-                .path("/api/auth") // refresh/logout 요청에만 전송
+                .path("/api/auth") // refresh,logout 요청에만 전송
                 .maxAge(Duration.ofSeconds(jwtCookieProperties.getRefreshTokenMaxAge()))
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+    }
 
+    public void addAccessTokenCookie(HttpServletResponse response, String accessToken) {
+        ResponseCookie accessCookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(jwtCookieProperties.isSecure())
+                .sameSite("Lax")
+                .path("/")
+                .maxAge(Duration.ofSeconds(jwtCookieProperties.getAccessTokenMaxAge()))
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
     }
 
     public void clearTokenCookies(HttpServletResponse response) {

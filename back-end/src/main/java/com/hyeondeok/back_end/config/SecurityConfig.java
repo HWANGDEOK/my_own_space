@@ -62,7 +62,9 @@ public class SecurityConfig {
                             "/api/auth/logout",
                             "/api/user/me",
                             "/api/posts/**",
-                            "/error"
+                            "/error",
+                            "/api/admin/activate",
+                            "/api/admin/deactivate"
                     ).permitAll()
                     .anyRequest().authenticated()
 
@@ -70,6 +72,9 @@ public class SecurityConfig {
             .exceptionHandling(exception -> exception
                     .authenticationEntryPoint((request, response, exception2) ->
                             response.sendError(HttpServletResponse.SC_UNAUTHORIZED)
+                    )
+                    .accessDeniedHandler((request, response, exception2) ->
+                            response.sendError(HttpServletResponse.SC_FORBIDDEN)
                     )
             )
             .oauth2Login(oauth2 -> oauth2

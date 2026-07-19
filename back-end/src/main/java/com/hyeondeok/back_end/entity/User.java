@@ -19,22 +19,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column
-    private String password;
-
-    @Column
+    @Column(nullable = false)
     private String provider;
 
-    @Column
+    @Column(nullable = false)
     private String providerId;
 
-    @Column
+    @Column(nullable = false)
     private String email;
 
     @Column(nullable = false)
     private String name;
 
-    @Column
+    @Column(nullable = false, unique = true)
     private String nickname;
 
     @CreationTimestamp
@@ -60,5 +57,13 @@ public class User {
     public void updateProfile(String name, String email) {
         this.name = name;
         this.email = email;
+    }
+
+    public void activateAdmin() {
+        this.role = Role.ROLE_ADMIN;
+    }
+
+    public void deactivateAdmin() {
+        this.role = Role.ROLE_USER;
     }
 }

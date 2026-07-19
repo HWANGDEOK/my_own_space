@@ -7,6 +7,8 @@ import com.hyeondeok.back_end.service.PostService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -55,9 +57,17 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public ResponseEntity<Void> deletePost(
             @PathVariable Long postId,
-            @RequestParam Long userId) {
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        postService.deletePost(postId, userId);
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+
+        Long userId = Long.parseLong(userDetails.getUsername());
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        postService.deletePost(postId, userId, isAdmin);
         return ResponseEntity.noContent().build();
     }
 
@@ -84,28 +94,26 @@ public class PostController {
             @PathVariable("commentId") Long commentId,
             @RequestBody CommentDto.CommentDtoUpdateReq request) {
 
-        try {
-            postService.updateComment(commentId, request);
-            return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 수정 중 오류가 발생했습니다.");
-        }
+
+        postService.updateComment(commentId, request);
+        return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다.");
     }
 
     // 댓글 삭제
     @DeleteMapping("/comments/{commentId}")
     public ResponseEntity<String> deleteComment(
-            @PathVariable("commentId") Long commentId) {
+            @PathVariable("commentId") Long commentId,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        try {
-            postService.deleteComment(commentId);
-            return ResponseEntity.ok("댓글이 성공적으로 삭제되었습니다.");
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("댓글 삭제 중 오류가 발생했습니다.");
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
+
+        Long userId = Long.parseLong(userDetails.getUsername());
+        boolean isAdmin = userDetails.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+
+        postService.deleteComment(commentId, userId, isAdmin);
+        return ResponseEntity.ok("댓글이 성공적으로 삭제되었습니다.");
     }
 }
