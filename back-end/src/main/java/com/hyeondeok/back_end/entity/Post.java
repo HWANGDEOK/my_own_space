@@ -29,7 +29,7 @@ public class Post {
     @Column(nullable = false)
     private String author;
 
-    @Column(columnDefinition = "TEXT", nullable = false)
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String content;
 
     @Enumerated(EnumType.STRING)
