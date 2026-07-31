@@ -43,6 +43,8 @@ dependencies {
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0")
 	// MySQL 커넥터
 	runtimeOnly("com.mysql:mysql-connector-j")
+	// html sanitizer
+	implementation("com.googlecode.owasp-java-html-sanitizer:owasp-java-html-sanitizer:20260313.1")
 
 }
 
