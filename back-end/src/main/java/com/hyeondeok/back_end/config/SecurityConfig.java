@@ -56,15 +56,17 @@ public class SecurityConfig {
                     .requestMatchers(
                             "/oauth2/**",
                             "/login/**",
+                            "/uploads/**",
                             "/api/auth/csrf",
                             "/api/auth/refresh",
                             "/api/auth/config",
                             "/api/auth/logout",
                             "/api/user/me",
                             "/api/posts/**",
-                            "/error",
+                            "/api/image/upload",
                             "/api/admin/activate",
-                            "/api/admin/deactivate"
+                            "/api/admin/deactivate",
+                            "/error"
                     ).permitAll()
                     .anyRequest().authenticated()
 
