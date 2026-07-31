@@ -7,6 +7,7 @@ import com.hyeondeok.back_end.entity.Post;
 import com.hyeondeok.back_end.entity.PostState;
 import com.hyeondeok.back_end.repository.CommentRepository;
 import com.hyeondeok.back_end.repository.PostRepository;
+import com.hyeondeok.back_end.util.HtmlSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -20,13 +21,16 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final HtmlSanitizer htmlSanitizer;
 
     // 게시글 등록
     @Transactional
     public Long createPost(PostDto.PostDtoReq request) {
+        String SanitizedContent = htmlSanitizer.sanitize(request.content());
+
         Post post = Post.builder()
                 .title(request.title())
-                .content(request.content())
+                .content(SanitizedContent)
                 .author(request.author())
                 .userId(request.userId())
                 .build();
@@ -69,7 +73,8 @@ public class PostService {
             throw new IllegalArgumentException("게시글 수정 권한이 없습니다.");
         }
 
-        post.updatePost(request.title(), request.content());
+        String SanitizedContent = htmlSanitizer.sanitize(request.content());
+        post.updatePost(request.title(), SanitizedContent);
 
         return post.getPostId();
     }
