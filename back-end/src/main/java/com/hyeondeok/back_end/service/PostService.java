@@ -5,8 +5,10 @@ import com.hyeondeok.back_end.dto.PostDto;
 import com.hyeondeok.back_end.entity.Comment;
 import com.hyeondeok.back_end.entity.Post;
 import com.hyeondeok.back_end.entity.PostState;
+import com.hyeondeok.back_end.entity.User;
 import com.hyeondeok.back_end.repository.CommentRepository;
 import com.hyeondeok.back_end.repository.PostRepository;
+import com.hyeondeok.back_end.repository.UserRepository;
 import com.hyeondeok.back_end.util.HtmlSanitizer;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,18 +23,23 @@ import java.util.stream.Collectors;
 public class PostService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
+    private final UserRepository userRepository;
     private final HtmlSanitizer htmlSanitizer;
 
     // 게시글 등록
     @Transactional
-    public Long createPost(PostDto.PostDtoReq request) {
+    public Long createPost(PostDto.PostDtoReq request, Long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
+
         String SanitizedContent = htmlSanitizer.sanitize(request.content());
+
 
         Post post = Post.builder()
                 .title(request.title())
                 .content(SanitizedContent)
-                .author(request.author())
-                .userId(request.userId())
+                .author(user.getNickname())
+                .userId(user.getUserId())
                 .build();
         return postRepository.save(post).getPostId();
     }

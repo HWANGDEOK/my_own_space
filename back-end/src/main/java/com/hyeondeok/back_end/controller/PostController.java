@@ -23,8 +23,14 @@ public class PostController {
 
     // 게시글 생성
     @PostMapping
-    public ResponseEntity<Long> createPost(@RequestBody PostDto.PostDtoReq request) {
-        Long postId = postService.createPost(request);
+    public ResponseEntity<Long> createPost(@RequestBody PostDto.PostDtoReq request,
+                                           @AuthenticationPrincipal UserDetails userDetails) {
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long requesterUserId = Long.parseLong(userDetails.getUsername());
+
+        Long postId = postService.createPost(request, requesterUserId);
         return ResponseEntity.status(HttpStatus.CREATED).body(postId);
     }
 
