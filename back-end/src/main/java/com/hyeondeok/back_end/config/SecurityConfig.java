@@ -63,7 +63,7 @@ public class SecurityConfig {
                             "/api/auth/logout",
                             "/api/user/me",
                             "/api/posts/**",
-                            "/api/image/upload",
+                            "/api/images/upload",
                             "/api/admin/activate",
                             "/api/admin/deactivate",
                             "/error"

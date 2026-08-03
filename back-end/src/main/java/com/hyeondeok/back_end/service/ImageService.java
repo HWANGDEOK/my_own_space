@@ -2,6 +2,7 @@ package com.hyeondeok.back_end.service;
 
 import com.hyeondeok.back_end.config.FileProperties;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class ImageService {
@@ -22,11 +24,13 @@ public class ImageService {
         }
 
         if (file.getSize() > fileProperties.getMaxSize().toBytes()) {
+            log.warn("업로드 실패 - 파일크기 초과");
             throw new IllegalArgumentException("파일 크기는 5MB를 초과할 수 없습니다.");
         }
 
         String contentType = file.getContentType();
         if (contentType == null || !fileProperties.getAllowedTypes().contains(contentType)) {
+            log.warn("업로드 실패 - MIME 타입 불일치: contentType={}, fileName={}", contentType, file.getOriginalFilename());
             throw new IllegalArgumentException("이미지 파일(jpg, png, gif, webp)만 업로드 가능합니다.");
         }
 

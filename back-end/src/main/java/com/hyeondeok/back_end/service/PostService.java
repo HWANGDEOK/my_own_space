@@ -71,12 +71,12 @@ public class PostService {
 
     // 게시글 수정
     @Transactional
-    public Long updatePost(Long postId, PostDto.PostUpdateReq request) {
+    public Long updatePost(Long postId, PostDto.PostUpdateReq request, Long userId) {
         Post post = postRepository.findById(postId)
                 .filter(p -> p.getState() == PostState.POST)
                 .orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않거나 이미 삭제되었습니다."));
 
-        if (!post.getUserId().equals(request.userId())) {
+        if (!post.getUserId().equals(userId)) {
             throw new IllegalArgumentException("게시글 수정 권한이 없습니다.");
         }
 

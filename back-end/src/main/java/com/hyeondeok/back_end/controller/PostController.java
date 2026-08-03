@@ -53,9 +53,15 @@ public class PostController {
     @PutMapping("/{postId}")
     public ResponseEntity<Long> updatePost(
             @PathVariable Long postId,
-            @RequestBody PostDto.PostUpdateReq request) {
+            @RequestBody PostDto.PostUpdateReq request,
+            @AuthenticationPrincipal UserDetails userDetails) {
 
-        Long updatedPostId = postService.updatePost(postId, request);
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        Long requesterUserId = Long.parseLong(userDetails.getUsername());
+
+        Long updatedPostId = postService.updatePost(postId, request, requesterUserId);
         return ResponseEntity.ok(updatedPostId);
     }
 

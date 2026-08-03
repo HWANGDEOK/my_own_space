@@ -17,7 +17,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/image")
+@RequestMapping("/api/images")
 public class ImageController {
 
     private final ImageService imageService;

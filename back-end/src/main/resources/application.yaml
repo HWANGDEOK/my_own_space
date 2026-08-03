@@ -5,3 +5,9 @@ spring:
 
   profiles:
     include: secret
+
+
+logging:
+  level:
+    root: info
+    com.hyeondeok.back_end.service: debug
