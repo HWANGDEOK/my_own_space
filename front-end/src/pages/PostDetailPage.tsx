@@ -193,9 +193,7 @@ function PostDetailPage() {
             </div>
             
             {/* 본문 내용 */}
-            <div style={{}}>
-                {post.content}
-            </div>
+            <div className="post-content" dangerouslySetInnerHTML={{ __html: post.content }} />
 
             {/* 댓글 섹션 */}
             <div style={{ marginTop: '40px' }}>

@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useUser } from '../hooks/useUser';
 import { useAuthStore } from '../store/authStore';
 import { postApi } from '../apis/postApi';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
+import api from '../apis/userApi';
 
 
 function PostCreatePage() {
@@ -21,6 +25,40 @@ function PostCreatePage() {
         }
     }, [isAuth, navigate]);
 
+    const editor = useEditor({
+        extensions: [StarterKit, Image],
+        content: '',
+        editorProps: {
+            attributes: {
+                style: 'min-height: 400px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; outline: none;',
+            },
+        },
+    });
+
+    // 이미지 파일 선택 -> 업로드 -> 에디터 커서 위치에 삽입
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editor) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await api.post<{ url: string }>(
+                '/images/upload',
+                formData,
+                { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+
+            editor.chain().focus().setImage({ src: response.data.url }).run();
+        } catch (error) {
+            console.error('이미지 업로드 실패', error);
+            alert('이미지 업로드에 실패했습니다. (5MB 이하 jpg/png/gif/webp만 가능)');
+        } finally {
+            e.target.value = ''; // 같은 파일 재선택 가능하도록 초기화
+        }
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
@@ -28,7 +66,13 @@ function PostCreatePage() {
             alert('사용자 정보를 불러올 수 없습니다. 다시 시도해주세요.');
             return;
         }
-        if (!title.trim() || !content.trim()) {
+
+        const content = editor.getHTML();
+        const isContentEmpty = editor.getText().trim() === '' && !content.includes('<img');
+
+
+
+        if (!title.trim() || isContentEmpty) {
             alert('제목과 내용을 모두 입력해주세요.');
             return;
         }
@@ -36,9 +80,7 @@ function PostCreatePage() {
         try {
             await postApi.createPost({
                 title,
-                content,
-                author: user.nickname,
-                userId: user.userId
+                content
             });
             alert('게시글이 등록되었습니다.');
             navigate('/postboard');
@@ -60,13 +102,25 @@ function PostCreatePage() {
                     onChange={(e) => setTitle(e.target.value)}
                     style={{ padding: '12px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
                 />
-                <textarea
+                {/* <textarea
                     placeholder="내용을 입력하세요"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows={10}
                     style={{ padding: '12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', resize: 'none' }}
-                />
+                /> */}
+                <div className="post-content">
+                    <label style={{ display: 'inline-block', marginBottom: '8px', cursor: 'pointer', color: '#007bff' }}>
+                        📷 이미지 삽입
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/gif,image/webp"
+                            onChange={handleImageUpload}
+                            style={{ display: 'none' }}
+                        />
+                    </label>
+                    <EditorContent editor={editor} />
+                </div>
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                     <button type="button" onClick={() => navigate(-1)} style={{ padding: '10px 20px', cursor: 'pointer' }}>취소</button>
                     <button type="submit"

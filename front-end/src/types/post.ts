@@ -20,15 +20,12 @@ export interface PostDetailRes {
 
 // 게시글 등록용
 export interface PostDtoReq {
-    userId: number;
     title: string;
-    author: string;
     content: string;
 }
 
 // 게시글 수정
 export interface PostUpdateReq {
-    userId: number;
     title: string;
     content: string;
 }

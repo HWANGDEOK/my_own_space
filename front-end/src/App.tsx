@@ -77,6 +77,7 @@ function App() {
         <Header />
         <div>
             <button onClick={() => navigate('/postboard')}>게시판</button>
+            <button onClick={() => navigate('/')}>메인</button>
             {user?.role === 'ROLE_ADMIN' && (
                 <div>
                     <button onClick={handleAdminDeactivate}>관리자모드 비활성화</button>

@@ -3,6 +3,10 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { useUser } from '../hooks/useUser';
 import { useAuthStore } from '../store/authStore';
 import { postApi } from '../apis/postApi';
+import { EditorContent, useEditor } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Image from '@tiptap/extension-image';
+import api from '../apis/userApi';
 
 function PostEditPage() {
     const { postId } = useParams<{ postId: string }>();
@@ -11,19 +15,31 @@ function PostEditPage() {
     const isAuth = useAuthStore((state) => state.isAuth);
 
     const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
     const [loading, setLoading] = useState(true);
 
-    // 비로그인 사용자 접근 차단 및 기존 게시글 데이터 불러오기
+    const editor = useEditor({
+        extensions: [StarterKit, Image],
+        content: '',
+        editorProps: {
+            attributes: {
+                style: 'min-height: 400px; padding: 12px; border: 1px solid #ccc; border-radius: 4px; outline: none;',
+            },
+        },
+    });
+
+    // 비로그인 사용자 접근 차단
     useEffect(() => {
         if (!isAuth) {
             alert('로그인이 필요한 서비스입니다.');
             navigate('/');
-            return;
         }
+    }, [isAuth, navigate]);
 
+    // 기존 게시글 데이터 불러오기
+    useEffect(() => {
         const fetchPostDetail = async () => {
-            if (!postId) return;
+            if (!postId || !editor || editor.isDestroyed) return;
+
             try {
                 const data = await postApi.getPostDetail(Number(postId));
                 
@@ -34,7 +50,7 @@ function PostEditPage() {
                 }
 
                 setTitle(data.title);
-                setContent(data.content);
+                editor.commands.setContent(data.content);
             } catch (error) {
                 console.error('수정할 게시글 조회 실패:', error);
                 alert('게시글을 불러오는데 실패했습니다.');
@@ -44,20 +60,49 @@ function PostEditPage() {
             }
         };
 
-        if (user) {
+        if (user && editor) {
             fetchPostDetail();
         }
-    }, [isAuth, navigate, postId, user]);
+    }, [isAuth, navigate, postId, user, editor]);
+
+    // 이미지 삽입
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file || !editor) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        try {
+            const response = await api.post<{ url: string }>(
+                '/images/upload',
+                formData,
+                { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+            editor.chain().focus().setImage({ src: response.data.url }).run();
+        } catch (error) {
+            console.error('이미지 업로드 실패', error);
+            alert('이미지 업로드에 실패했습니다. (5MB 이하 jpg/png/gif/webp만 가능, 또는 다른 오류)');
+        } finally {
+            e.target.value = '';
+        }
+    };
+
 
     // 수정 완료
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!user) {
+        if (!user || !editor) {
             alert('사용자 정보를 불러올 수 없습니다. 다시 시도해주세요.');
             return;
         }
-        if (!title.trim() || !content.trim()) {
+
+        const content = editor.getHTML();
+        const isContentEmpty = editor.getText().trim() === '' && !content.includes('<img');
+
+
+        if (!title.trim() || isContentEmpty) {
             alert('제목과 내용을 모두 입력해주세요.');
             return;
         }
@@ -66,7 +111,6 @@ function PostEditPage() {
             await postApi.updatePost(Number(postId), {
                 title,
                 content,
-                userId: user.userId
             });
             alert('게시글이 수정되었습니다.');
             navigate(`/posts/${postId}`);
@@ -90,13 +134,27 @@ function PostEditPage() {
                     onChange={(e) => setTitle(e.target.value)}
                     style={{ padding: '12px', fontSize: '16px', borderRadius: '4px', border: '1px solid #ccc' }}
                 />
-                <textarea
+                {/* <textarea
                     placeholder="내용을 입력하세요"
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
                     rows={10}
                     style={{ padding: '12px', fontSize: '14px', borderRadius: '4px', border: '1px solid #ccc', resize: 'none' }}
-                />
+                /> */}
+                <div className='post-content'>
+                    <label style={{ display: 'inline-block', marginBottom: '8px', cursor: 'pointer', color: '#007bff' }}>
+                        📷 이미지 삽입
+                        <input
+                            type="file"
+                            accept="image/jpeg,image/png,image/gif,image/webp"
+                            onChange={handleImageUpload}
+                            style={{ display: 'none' }}
+                        />
+                    </label>
+                    <EditorContent editor={editor} />
+                </div>
+
+
                 <div style={{ display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                     <button type="button" onClick={() => navigate(-1)} style={{ padding: '10px 20px', cursor: 'pointer' }}>취소</button>
                     <button type="submit"
