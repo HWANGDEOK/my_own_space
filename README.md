@@ -108,6 +108,6 @@
 - [x] **JWT Refresh Token Rotation (Redis) & OAuth2**
 - [x] **RBAC 권한 동적 승격 및 관리자 페이지**
 - [x] **로컬 이미지 첨부 게시판 및 대댓글**
-- [ ] **장바구니 & 결제 시스템 Integration**
+- [ ] **장바구니 & 결제 시스템**
 - [ ] **동시성 제어를 고려한 예약 시스템**
 - [ ] **S3 / Cloud Storage 기반 이미지 업로드 이관**
