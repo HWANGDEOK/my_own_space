@@ -11,3 +11,16 @@ logging:
   level:
     root: info
     com.hyeondeok.back_end.service: debug
+
+
+file:
+  upload:
+    # FILE_UPLOAD_DIR 값이 있으면 사용하고, 없으면 기본값인 ./uploads/ 사용
+    dir: ${FILE_UPLOAD_DIR:./uploads/}
+    max_size: ${FILE_UPLOAD_MAX_SIZE:5MB}
+    allowed-types:
+      - image/jpeg
+      - image/png
+      - image/gif
+      - image/webp
+      - image/pjpeg
