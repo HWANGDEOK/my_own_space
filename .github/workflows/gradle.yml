@@ -51,3 +51,16 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew clean build
         working-directory: ./back-end  # back-end 폴더 안으로 이동해서 권한 부여
+        env:
+          # Spring Boot가 yml의 jwt.secret으로 자동 매핑함
+          JWT_SECRET: ${{ secrets.JWT_SECRET }}
+          JWT_COOKIE_ACCESS_TOKEN_MAX_AGE: ${{ secrets.JWT_COOKIE_ACCESS_TOKEN_MAX_AGE }}
+          JWT_COOKIE_REFRESH_TOKEN_MAX_AGE: ${{ secrets.JWT_COOKIE_REFRESH_TOKEN_MAX_AGE }}
+          JWT_COOKIE_SECURE: ${{ secrets.JWT_COOKIE_SECURE }}
+
+          # Spring Boot가 yml의 admin.activation-key로 자동 매핑함
+          ADMIN_ACTIVATION_KEY: ${{ secrets.ADMIN_ACTIVATION_KEY }}
+
+          # Spring Boot가 yml의 file.upload.dir 등으로 자동 매핑함
+          FILE_UPLOAD_DIR: ${{ secrets.FILE_UPLOAD_DIR }}
+          FILE_UPLOAD_MAX_SIZE: ${{ secrets.FILE_UPLOAD_MAX_SIZE }}
