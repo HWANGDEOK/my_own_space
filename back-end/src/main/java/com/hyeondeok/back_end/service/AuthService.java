@@ -6,7 +6,6 @@ import com.hyeondeok.back_end.jwt.JwtTokenProvider;
 import com.hyeondeok.back_end.repository.RefreshTokenRepository;
 import com.hyeondeok.back_end.repository.UserRepository;
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
