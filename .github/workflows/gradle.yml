@@ -44,8 +44,10 @@ jobs:
       # Step 3: 리눅스 환경에서 ./gradlew 실행 파일을 동작시킬 수 있도록 실행 권한(+x) 부여
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
+        working-directory: ./backend  # backend 폴더 안으로 이동해서 권한 부여
 
       # Step 4: 이전 빌드 결과물을 깨끗이 지우고(clean), 처음부터 다시 빌드 및 테스트(build) 진행
       # 이 과정에서 @SpringBootTest 같은 테스트 코드들이 실행되며, 위에 띄운 Redis와 통신하게 됩니다.
       - name: Build with Gradle
         run: ./gradlew clean build
+        working-directory: ./backend  # backend 폴더 안으로 이동해서 권한 부여
