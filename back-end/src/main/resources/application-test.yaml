@@ -1,0 +1,50 @@
+spring:
+  config:
+    activate:
+      on-profile: test
+
+  # DB: 테스트 시에는 실제 DB(MySQL) 대신 메모리 DB(H2)를 쓰도록 설정
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
+  # OAuth2: 기본값으로 가짜 문자열을 넣어둠
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: ${OAUTH_GOOGLE_CLIENT_ID:dummy-google-client-id}
+            client-secret: ${OAUTH_GOOGLE_CLIENT_SECRET:dummy-google-client-secret}
+            scope:
+              - email
+              - profile
+
+# JWT: 가짜 Secret Key (256비트 이상 길이만 맞춰줌)
+jwt:
+  secret: ${JWT_SECRET:dummy-jwt-secret-key-for-test-environment-32bytes-over!}
+  cookie:
+    access-token-max-age: ${JWT_COOKIE_ACCESS_TOKEN_MAX_AGE:3600}
+    refresh-token-max-age: ${JWT_COOKIE_REFRESH_TOKEN_MAX_AGE:1209600}
+    secure: ${JWT_COOKIE_SECURE:false}
+
+admin:
+  activation-key: ${ADMIN_ACTIVATION_KEY:test123456}
+
+file:
+  upload:
+    # FILE_UPLOAD_DIR 값이 있으면 사용하고, 없으면 기본값인 ./uploads/ 사용
+    dir: ${FILE_UPLOAD_DIR:./uploads/}
+    max_size: ${FILE_UPLOAD_MAX_SIZE:5MB}
+    allowed-types:
+      - image/jpeg
+      - image/png
+      - image/gif
+      - image/webp
+      - image/pjpeg

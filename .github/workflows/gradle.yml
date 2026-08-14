@@ -52,6 +52,10 @@ jobs:
         run: ./gradlew clean build --info
         working-directory: ./back-end  # back-end 폴더 안으로 이동해서 권한 부여
         env:
+          # OAuth2 Google (추가)
+          OAUTH_GOOGLE_CLIENT_ID: ${{ secrets.OAUTH_GOOGLE_CLIENT_ID }}
+          OAUTH_GOOGLE_CLIENT_SECRET: ${{ secrets.OAUTH_GOOGLE_CLIENT_SECRET }}
+
           # Spring Boot가 yml의 jwt.secret으로 자동 매핑함
           JWT_SECRET: ${{ secrets.JWT_SECRET }}
           JWT_COOKIE_ACCESS_TOKEN_MAX_AGE: ${{ secrets.JWT_COOKIE_ACCESS_TOKEN_MAX_AGE }}
