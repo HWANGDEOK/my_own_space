@@ -5,6 +5,12 @@ bootrun.log
 bootrun.stderr.log
 bootrun.stdout.log
 
+# Back-end
+back-end/build/
+back-end/.gradle/
+back-end/out/
+back-end/src/main/resources/application-secret.yml
+
 
 HELP.md
 .gradle
